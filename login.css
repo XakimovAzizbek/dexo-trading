@@ -1,0 +1,280 @@
+/* ============================================
+   DEXO TRADING — Login Styles
+============================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-deep:    #080c14;
+  --bg-card:    #0d1420;
+  --bg-surface: #111c2d;
+  --accent:     #00d4aa;
+  --accent-dim: #00d4aa18;
+  --accent-glow:#00d4aa40;
+  --warn:       #f04f5a;
+  --t1:         #e8edf5;
+  --t2:         #8a95a8;
+  --t3:         #3d4f64;
+  --border:     #1e2d42;
+  --radius:     16px;
+  --font-main:  'Space Grotesk', sans-serif;
+  --font-mono:  'JetBrains Mono', monospace;
+}
+
+html { font-size: 16px; }
+
+body {
+  background: var(--bg-deep);
+  color: var(--t1);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+/* ── Background grid ── */
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 52px 52px;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-glow {
+  position: fixed;
+  top: -180px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 650px;
+  height: 480px;
+  background: radial-gradient(ellipse at center, #00d4aa12 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Center layout ── */
+.center {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 40px 16px;
+  min-height: 100vh;
+}
+
+/* ── Logo ── */
+.logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 40px;
+  user-select: none;
+}
+
+.logo-icon {
+  width: 56px;
+  height: 56px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-glow);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 28px var(--accent-glow);
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.logo-name {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--t1);
+}
+
+.logo-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.38em;
+  color: var(--accent);
+  margin-top: 4px;
+}
+
+/* ── Card ── */
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px #ffffff05 inset,
+    0 40px 80px #00000070;
+}
+
+.card-header {
+  padding: 36px 36px 0;
+  text-align: center;
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--t1);
+  letter-spacing: 0.01em;
+  margin-bottom: 8px;
+}
+
+.card-desc {
+  font-size: 13px;
+  color: var(--t2);
+  line-height: 1.5;
+}
+
+.card-body {
+  padding: 32px 36px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* ── Divider ── */
+.divider {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--t3);
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Google button ── */
+.btn-google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 20px;
+  font-family: var(--font-main);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--t1);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
+  position: relative;
+}
+
+.btn-google:hover {
+  border-color: var(--accent);
+  background: #0f1d2e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px #00000040;
+}
+
+.btn-google:active {
+  transform: translateY(0);
+}
+
+.btn-google:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.google-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.btn-google-text {
+  flex: 1;
+  text-align: center;
+}
+
+/* loader */
+.btn-loader {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+.btn-loader.hidden { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Error ── */
+.error-msg {
+  width: 100%;
+  font-size: 13px;
+  color: var(--warn);
+  font-weight: 500;
+  text-align: center;
+  min-height: 0;
+  display: none;
+  background: #f04f5a14;
+  border: 1px solid #f04f5a30;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.error-msg.show { display: block; }
+
+/* ── Terms ── */
+.terms {
+  font-size: 12px;
+  color: var(--t3);
+  text-align: center;
+  line-height: 1.6;
+  max-width: 300px;
+}
+.terms span {
+  color: var(--accent);
+  cursor: pointer;
+}
+.terms span:hover { text-decoration: underline; }
+
+/* ── Footer ── */
+.footer-note {
+  margin-top: 32px;
+  font-size: 12px;
+  color: var(--t3);
+  letter-spacing: 0.04em;
+  font-family: var(--font-mono);
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .card-header { padding: 28px 24px 0; }
+  .card-body   { padding: 24px 24px 28px; }
+  .logo-name   { font-size: 26px; }
+}
