@@ -1,0 +1,99 @@
+/* ============================================
+   DEXO TRADING — Admin Panel Styles
+============================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-deep:#080c14;--bg-card:#0d1420;--bg-surface:#111c2d;
+  --accent:#00d4aa;--accent-dim:#00d4aa18;--accent-glow:#00d4aa35;
+  --up:#00c896;--down:#f04f5a;--warn:#f5a623;
+  --t1:#e8edf5;--t2:#8a95a8;--t3:#3d4f64;--border:#1e2d42;
+  --font-main:'Space Grotesk',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+html{font-size:16px}
+body{background:var(--bg-deep);color:var(--t1);font-family:var(--font-main);min-height:100vh;overflow-x:hidden}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:52px 52px;opacity:.22;pointer-events:none;z-index:0}
+
+/* HEADER */
+.top-header{position:fixed;top:0;left:0;right:0;height:58px;background:#080c14ee;backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:200}
+.header-left{display:flex;align-items:center;gap:10px}
+.logo-icon-sm{width:32px;height:32px;background:var(--accent-dim);border:1px solid var(--accent-glow);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.header-brand{font-size:16px;font-weight:700;letter-spacing:.06em;color:var(--warn)}
+.logout-btn{background:transparent;border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-family:var(--font-main);font-size:12px;color:var(--t2);cursor:pointer;transition:all .2s}
+.logout-btn:hover{border-color:var(--down);color:var(--down)}
+
+/* CONTENT */
+.page-content{position:relative;z-index:10;padding:74px 16px 20px;max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+
+/* SECTION CARD */
+.section-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:22px 20px}
+.section-head{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.sh-icon{font-size:24px;width:44px;height:44px;background:var(--bg-surface);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.sh-title{font-size:16px;font-weight:700;color:var(--t1);margin-bottom:2px}
+.sh-sub{font-size:12px;color:var(--t2);font-family:var(--font-mono)}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+@media(max-width:440px){.form-grid{grid-template-columns:1fr}}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t2)}
+.form-group input,.form-group select{background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;padding:11px 13px;font-family:var(--font-main);font-size:13px;color:var(--t1);outline:none;transition:border-color .2s;width:100%}
+.form-group input::placeholder{color:var(--t3)}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent)}
+.form-group select option{background:var(--bg-surface);color:var(--t1)}
+
+/* PCT input */
+.pct-wrap{position:relative;display:flex;align-items:center}
+.pct-wrap input{padding-right:32px}
+.pct-sign{position:absolute;right:12px;color:var(--t2);font-family:var(--font-mono);font-size:14px;pointer-events:none}
+.quick-pcts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.quick-pcts button{background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-family:var(--font-mono);font-size:11px;color:var(--t2);cursor:pointer;transition:all .15s}
+.quick-pcts button:hover{border-color:var(--accent);color:var(--accent)}
+
+/* SELECTED INFO */
+.selected-info{background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:13px 16px;display:flex;flex-direction:column;gap:6px}
+.selected-info.hidden{display:none}
+.si-row{display:flex;justify-content:space-between;align-items:center}
+.si-label{font-size:12px;color:var(--t2)}
+.si-val{font-size:14px;font-weight:600;font-family:var(--font-mono);color:var(--t1)}
+
+/* MESSAGES */
+.error-msg{font-size:13px;color:var(--down);min-height:0;font-weight:500;display:none;margin-bottom:8px}
+.error-msg.show{display:block}
+.success-msg{font-size:13px;color:var(--up);font-weight:600;display:none;margin-top:10px;text-align:center}
+.success-msg.show{display:block}
+
+/* BUTTONS */
+.btn-primary{width:100%;background:var(--accent);color:#071210;border:none;border-radius:9px;padding:13px;font-family:var(--font-main);font-size:14px;font-weight:700;letter-spacing:.05em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s,transform .15s;margin-top:4px}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+.action-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.btn-up,.btn-down{display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:10px;padding:14px;font-family:var(--font-main);font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s,transform .15s}
+.btn-up{background:#00c89620;color:var(--up);border:1px solid var(--up)}
+.btn-down{background:#f04f5a20;color:var(--down);border:1px solid var(--down)}
+.btn-up:hover,.btn-down:hover{opacity:.8;transform:translateY(-1px)}
+.btn-up:disabled,.btn-down:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-up svg,.btn-down svg{width:18px;height:18px}
+
+/* LOADER */
+.btn-loader{width:16px;height:16px;border:2px solid #ffffff30;border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.btn-loader.hidden{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ADMIN STOCKS LIST */
+#admin-stocks-list{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.adm-stock{background:var(--bg-surface);border:1px solid var(--border);border-radius:11px;padding:13px 16px;display:flex;align-items:center;gap:12px}
+.adm-icon{font-size:20px;width:38px;height:38px;background:var(--bg-card);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.adm-info{flex:1;min-width:0}
+.adm-symbol{font-size:14px;font-weight:700;color:var(--t1)}
+.adm-price{font-size:12px;font-family:var(--font-mono);color:var(--t2);margin-top:1px}
+.adm-change{font-size:12px;font-family:var(--font-mono);font-weight:600;padding:2px 8px;border-radius:20px}
+.adm-change.up{color:var(--up);background:#00c89618}
+.adm-change.down{color:var(--down);background:#f04f5a18}
+.adm-del{background:transparent;border:1px solid #f04f5a30;border-radius:7px;padding:6px 10px;font-size:11px;color:var(--down);cursor:pointer;transition:all .2s;white-space:nowrap}
+.adm-del:hover{background:#f04f5a18;border-color:var(--down)}
+
+.stock-skeleton{height:64px;background:var(--bg-surface);border:1px solid var(--border);border-radius:11px;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.empty-state{text-align:center;padding:30px;color:var(--t3);font-size:13px}
