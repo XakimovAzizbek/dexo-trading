@@ -28,7 +28,7 @@ const db   = getFirestore(app);
 // ── Admin UIDs ro'yxati — o'zingizni UID qo'shing ──
 // Firebase Console → Authentication → foydalanuvchi UID
 const ADMIN_UIDS = [
-  "YOUR_ADMIN_UID_HERE"   // <-- o'zingizning UID ni shu yerga qo'ying
+  "JKAVgIBjBDQJ9CZYzAEMlD0ABKX2"   // <-- o'zingizning UID ni shu yerga qo'ying
 ];
 
 let stocksCache = [];  // { id, symbol, name, emoji, price, change24h }
