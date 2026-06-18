@@ -27,16 +27,39 @@ body{background:var(--bg-deep);color:var(--t1);font-family:var(--font-main);min-
 .page-content{position:relative;z-index:10;padding:74px 16px 20px;max-width:600px;margin:0 auto}
 
 /* PRICE HERO */
-.price-hero{text-align:center;margin-bottom:24px}
+.price-hero{text-align:center;margin-bottom:20px}
 .ph-price{font-size:40px;font-weight:700;font-family:var(--font-mono);color:var(--t1);letter-spacing:-0.02em;margin-bottom:8px}
 .ph-change{display:inline-block;font-size:14px;font-weight:600;font-family:var(--font-mono);padding:5px 16px;border-radius:20px}
 .ph-change.up{color:var(--up);background:#00c89618;border:1px solid #00c89630}
 .ph-change.down{color:var(--down);background:#f04f5a18;border:1px solid #f04f5a30}
 .ph-change.neutral{color:var(--t2);background:var(--bg-surface);border:1px solid var(--border)}
 
+/* TIMEFRAME SELECTOR */
+.timeframe-selector{display:flex;gap:6px;margin-bottom:16px;justify-content:center;padding:0 8px}
+.tf-btn{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;transition:all .2s;letter-spacing:.05em}
+.tf-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tf-btn.active{background:var(--accent);color:#0a1410;border-color:var(--accent)}
+
 /* CHART */
-.chart-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:20px 16px 14px;margin-bottom:20px;position:relative;min-height:220px;display:flex;align-items:center;justify-content:center}
-#price-chart{width:100%!important;max-height:200px}
+.chart-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:20px;position:relative;min-height:320px;display:flex;align-items:center;justify-content:center}
+.chart-container{width:100%;height:300px;position:relative;display:flex;flex-direction:column}
+.chart-canvas-wrapper{flex:1;position:relative;overflow:hidden;border:1px solid var(--border);border-radius:8px;background:var(--bg-surface)}
+#candlestick-chart{width:100%;height:100%;display:block;cursor:grab}
+#candlestick-chart:active{cursor:grabbing}
+
+/* Chart axes */
+.chart-y-axis{width:50px;position:absolute;left:0;top:0;bottom:20px;display:flex;flex-direction:column;justify-content:space-between;padding:8px 4px 0 4px;font-size:10px;color:var(--t3);font-family:var(--font-mono);text-align:right;z-index:1}
+.chart-x-axis{display:flex;gap:20px;padding:8px 50px 0 0;font-size:10px;color:var(--t3);font-family:var(--font-mono);text-align:center}
+
+/* Tooltip */
+.chart-tooltip{position:absolute;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:12px;z-index:100;pointer-events:none;min-width:140px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.chart-tooltip.hidden{display:none}
+.tooltip-row{display:flex;justify-content:space-between;gap:12px;margin-bottom:6px;font-family:var(--font-mono)}
+.tooltip-row:last-of-type{margin-bottom:0}
+.tooltip-label{color:var(--t2)}
+.tooltip-val{color:var(--t1);font-weight:600}
+.tooltip-time{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--t2);font-size:11px;text-align:center}
+
 .chart-empty{text-align:center;color:var(--t3);font-size:13px;padding:40px}
 .chart-empty.hidden{display:none}
 
@@ -60,3 +83,10 @@ body{background:var(--bg-deep);color:var(--t1);font-family:var(--font-main);min-
 .tbtn.sell{background:var(--down);color:#1a040a}
 .tbtn:hover{opacity:.88;transform:translateY(-1px)}
 .tbtn:active{transform:translateY(0)}
+
+/* Responsive */
+@media(max-width:480px){
+  .chart-y-axis{width:40px;font-size:9px}
+  .chart-x-axis{padding:8px 40px 0 0;gap:16px;font-size:9px}
+  .chart-tooltip{min-width:120px;padding:10px 12px;font-size:11px}
+}

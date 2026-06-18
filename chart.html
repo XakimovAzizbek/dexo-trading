@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <link rel="stylesheet" href="chart.css"/>
 </head>
 <body>
@@ -34,9 +33,47 @@
     <div class="ph-change" id="ph-change">—</div>
   </div>
 
-  <!-- Chart -->
+  <!-- Timeframe selector -->
+  <div class="timeframe-selector">
+    <button class="tf-btn active" onclick="changeTimeframe(60)">1m</button>
+    <button class="tf-btn" onclick="changeTimeframe(600)">10m</button>
+    <button class="tf-btn" onclick="changeTimeframe(3600)">1h</button>
+    <button class="tf-btn" onclick="changeTimeframe(86400)">1d</button>
+    <button class="tf-btn" onclick="changeTimeframe(2592000)">1M</button>
+  </div>
+
+  <!-- Chart Container -->
   <div class="chart-wrap">
-    <canvas id="price-chart"></canvas>
+    <div class="chart-container">
+      <div class="chart-y-axis" id="chart-y-axis"></div>
+      <div class="chart-canvas-wrapper">
+        <canvas id="candlestick-chart"></canvas>
+        <div class="chart-tooltip hidden" id="chart-tooltip">
+          <div class="tooltip-row">
+            <span class="tooltip-label">Ochilish:</span>
+            <span class="tooltip-val" id="tooltip-open">—</span>
+          </div>
+          <div class="tooltip-row">
+            <span class="tooltip-label">Yopilish:</span>
+            <span class="tooltip-val" id="tooltip-close">—</span>
+          </div>
+          <div class="tooltip-row">
+            <span class="tooltip-label">Eng yuqori:</span>
+            <span class="tooltip-val" id="tooltip-high">—</span>
+          </div>
+          <div class="tooltip-row">
+            <span class="tooltip-label">Eng past:</span>
+            <span class="tooltip-val" id="tooltip-low">—</span>
+          </div>
+          <div class="tooltip-row">
+            <span class="tooltip-label">O'zgarish:</span>
+            <span class="tooltip-val" id="tooltip-change">—</span>
+          </div>
+          <div class="tooltip-time" id="tooltip-time">—</div>
+        </div>
+      </div>
+      <div class="chart-x-axis" id="chart-x-axis"></div>
+    </div>
     <div class="chart-empty hidden" id="chart-empty">
       <p>Narx tarixi hali yo'q</p>
     </div>
@@ -57,7 +94,7 @@
       <div class="sb-val down" id="sb-low">—</div>
     </div>
     <div class="stat-box">
-      <div class="sb-label">O'zgarishlar soni</div>
+      <div class="sb-label">Shamlar soni</div>
       <div class="sb-val" id="sb-count">—</div>
     </div>
   </div>
