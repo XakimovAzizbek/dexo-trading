@@ -131,6 +131,105 @@
     <div id="price-success" class="success-msg"></div>
   </div>
 
+  <!-- ═══════ AI NARX BOSHQARISH ═══════ -->
+  <div class="section-card">
+    <div class="section-head">
+      <div class="sh-icon">🤖</div>
+      <div>
+        <div class="sh-title">AI Narx Boshqarish</div>
+        <div class="sh-sub">Avtomatik narx nazorati vaqt va foiz bilan</div>
+      </div>
+    </div>
+
+    <!-- Aksiya tanlash -->
+    <div class="form-group">
+      <label>Aksiyani tanlang</label>
+      <select id="ai-stock-select">
+        <option value="">— Aksiya tanlang —</option>
+      </select>
+    </div>
+
+    <!-- Tanlangan aksiya info -->
+    <div id="ai-selected-info" class="selected-info hidden">
+      <div class="si-row">
+        <span class="si-label">Joriy narx:</span>
+        <span class="si-val" id="ai-si-price">—</span>
+      </div>
+    </div>
+
+    <!-- Vaqt tanlash -->
+    <div class="form-group" style="margin-top:14px">
+      <label>Vaqt muddati</label>
+      <select id="ai-duration-select">
+        <option value="">— Vaqt tanlang —</option>
+        <option value="60">1 minut</option>
+        <option value="3600">1 soat</option>
+        <option value="86400">1 kun</option>
+        <option value="2592000">1 oy</option>
+      </select>
+    </div>
+
+    <!-- Foiz kiritish -->
+    <div class="form-group" style="margin-top:14px">
+      <label>O'zgartirish foizi (%)</label>
+      <div class="pct-wrap">
+        <input id="ai-pct-input" type="number" placeholder="0.01" min="0.001" max="100" step="0.001"/>
+        <span class="pct-sign">%</span>
+      </div>
+      <div class="quick-pcts">
+        <button onclick="setAIPct(0.01)">0.01%</button>
+        <button onclick="setAIPct(0.1)">0.1%</button>
+        <button onclick="setAIPct(0.5)">0.5%</button>
+        <button onclick="setAIPct(1)">1%</button>
+        <button onclick="setAIPct(5)">5%</button>
+        <button onclick="setAIPct(10)">10%</button>
+      </div>
+    </div>
+
+    <!-- Yo'nalish tanlash -->
+    <div class="form-group" style="margin-top:14px">
+      <label>Yo'nalish</label>
+      <div class="direction-btns">
+        <button id="ai-dir-up" class="dir-btn" onclick="selectAIDirection('up')">📈 Ko'tarish</button>
+        <button id="ai-dir-down" class="dir-btn" onclick="selectAIDirection('down')">📉 Tushirish</button>
+      </div>
+    </div>
+
+    <div id="ai-error" class="error-msg"></div>
+
+    <!-- Boshlash / Tugatish tugmalari -->
+    <div class="action-btns">
+      <button class="btn-up" id="btn-ai-start" onclick="startAIPriceControl()">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+        <span>Boshlash</span>
+        <span class="btn-loader hidden" id="ai-start-loader"></span>
+      </button>
+      <button class="btn-down" id="btn-ai-stop" onclick="stopAIPriceControl()" disabled>
+        <svg viewBox="0 0 24 24" fill="none"><path d="M6 4h12v16H6z" fill="currentColor"/></svg>
+        <span>Tugatish</span>
+        <span class="btn-loader hidden" id="ai-stop-loader"></span>
+      </button>
+    </div>
+
+    <!-- Status -->
+    <div id="ai-status" class="ai-status hidden">
+      <div class="status-row">
+        <span class="status-label">Holati:</span>
+        <span class="status-val" id="ai-status-text">—</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Qolgan vaqt:</span>
+        <span class="status-val" id="ai-remaining-time">—</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Joriy narx:</span>
+        <span class="status-val" id="ai-current-price">—</span>
+      </div>
+    </div>
+
+    <div id="ai-success" class="success-msg"></div>
+  </div>
+
   <!-- ═══════ BARCHA AKSIYALAR ═══════ -->
   <div class="section-card">
     <div class="section-head">
