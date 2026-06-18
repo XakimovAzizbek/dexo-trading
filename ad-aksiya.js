@@ -1,5 +1,6 @@
 // ============================================
 //  DEXO TRADING — Admin Panel Logic
+//  AI rejimi tab yopilsa ham ishlab turadi
 // ============================================
 import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
@@ -26,14 +27,13 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 
 // ── Admin UIDs ro'yxati — o'zingizni UID qo'shing ──
-// Firebase Console → Authentication → foydalanuvchi UID
 const ADMIN_UIDS = [
-  "JKAVgIBjBDQJ9CZYzAEMlD0ABKX2"   // <-- o'zingizning UID ni shu yerga qo'ying
+  "JKAVgIBjBDQJ9CZYzAEMlD0ABKX2"
 ];
 
-let stocksCache = [];  // { id, symbol, name, emoji, price, change24h }
+let stocksCache = [];
 
-// ── AI NARX BOSHQARISH STATE ──
+// ── AI NARX BOSHQARISH STATE ── (background-da ham ishladi)
 let aiPriceControlState = {
   running: false,
   stockId: null,
@@ -45,7 +45,7 @@ let aiPriceControlState = {
   initialPrice: null,
   targetPrice: null,
   intervalId: null,
-  updateIntervalMs: 1500  // Har 1.5 sekundda yangilash
+  updateIntervalMs: 1500
 };
 
 onAuthStateChanged(auth, (user) => {
@@ -56,10 +56,114 @@ onAuthStateChanged(auth, (user) => {
     return;
   }
   loadAdminStocks();
+  
+  // Service Worker register qilish
+  registerServiceWorker();
+  
+  // Sahifani yopshdan oldin AI state saqlash
+  setupPageVisibilityHandling();
+  
+  // Sahifa qayta open bo'lsa AI state restore qilish
+  restoreAIStateFromStorage();
 });
+
+// ── Service Worker Register ───────────────
+async function registerServiceWorker() {
+  if ("serviceWorker" in navigator) {
+    try {
+      const registration = await navigator.serviceWorker.register("sw.js", {
+        scope: "/"
+      });
+      console.log("Service Worker registered:", registration);
+      
+      // Background Sync setup
+      if ("sync" in registration) {
+        try {
+          await registration.sync.register("ai-price-update");
+        } catch (e) {
+          console.log("Background Sync not available");
+        }
+      }
+    } catch (e) {
+      console.log("Service Worker registration failed:", e);
+    }
+  }
+}
+
+// ── Page Visibility Handling ───────────────
+function setupPageVisibilityHandling() {
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      // Sahifa yopilishi - state localStorage-ga saqlash
+      if (aiPriceControlState.running) {
+        saveAIStateToStorage(aiPriceControlState);
+        console.log("AI state saved to storage for background mode");
+      }
+    } else {
+      // Sahifa qayta open - state restore qilish
+      restoreAIStateFromStorage();
+    }
+  });
+  
+  // Sahifa yopilishdan oldin
+  window.addEventListener("beforeunload", () => {
+    if (aiPriceControlState.running) {
+      saveAIStateToStorage(aiPriceControlState);
+    }
+  });
+}
+
+// ── LocalStorage AI State ──────────────────
+function saveAIStateToStorage(state) {
+  localStorage.setItem("dexo_ai_state", JSON.stringify(state));
+}
+
+function getAIStateFromStorage() {
+  const stored = localStorage.getItem("dexo_ai_state");
+  return stored ? JSON.parse(stored) : null;
+}
+
+function clearAIStateFromStorage() {
+  localStorage.removeItem("dexo_ai_state");
+}
+
+// ── Sahifa open bo'lsa restore qilish ─────
+async function restoreAIStateFromStorage() {
+  const stored = getAIStateFromStorage();
+  if (stored && stored.running) {
+    console.log("Restoring AI state from storage...", stored);
+    
+    // State restore
+    aiPriceControlState = stored;
+    
+    // UI update
+    updateAIUIFromState(stored);
+    
+    // Background loop restart
+    startAIBackgroundLoop();
+  }
+}
+
+function updateAIUIFromState(state) {
+  document.getElementById("btn-ai-start").disabled = true;
+  document.getElementById("btn-ai-stop").disabled = false;
+  document.getElementById("ai-stock-select").disabled = true;
+  document.getElementById("ai-duration-select").disabled = true;
+  document.getElementById("ai-pct-input").disabled = true;
+  document.getElementById("ai-status").classList.remove("hidden");
+  
+  const stock = stocksCache.find(s => s.id === state.stockId);
+  if (stock) {
+    document.getElementById("ai-stock-select").value = state.stockId;
+  }
+}
 
 // ── Logout ───────────────────────────────────
 document.getElementById("logout-btn").addEventListener("click", async () => {
+  clearAIStateFromStorage();
+  if (aiPriceControlState.intervalId) {
+    clearInterval(aiPriceControlState.intervalId);
+  }
   await signOut(auth);
   window.location.href = "login.html";
 });
@@ -185,8 +289,8 @@ window.startAIPriceControl = async function() {
   if (isNaN(percentage) || percentage <= 0) return showErr("ai", "Foiz to'g'ri kiritilmagan.");
   if (!direction) return showErr("ai", "Yo'nalish tanlanmagan.");
 
-  const stock = stocksCache.find(s => s.id === stockId);
-  if (!stock) return showErr("ai", "Aksiya topilmadi.");
+  const s = stocksCache.find(x => x.id === stockId);
+  if (!s) return showErr("ai", "Aksiya topilmadi.");
 
   if (aiPriceControlState.running) {
     return showErr("ai", "AI allaqachon ishgacha.");
@@ -203,13 +307,16 @@ window.startAIPriceControl = async function() {
       duration: duration,
       startTime: Date.now(),
       endTime: Date.now() + (duration * 1000),
-      initialPrice: stock.price,
+      initialPrice: s.price,
       targetPrice: direction === "up" 
-        ? stock.price * (1 + percentage / 100)
-        : stock.price * (1 - percentage / 100),
+        ? s.price * (1 + percentage / 100)
+        : s.price * (1 - percentage / 100),
       intervalId: null,
       updateIntervalMs: 1500
     };
+
+    // State localStorage-ga saqlash (background-da ham ishlab turadigan qilish uchun)
+    saveAIStateToStorage(aiPriceControlState);
 
     // UI yangilash
     document.getElementById("btn-ai-start").disabled = true;
@@ -221,11 +328,10 @@ window.startAIPriceControl = async function() {
     document.getElementById("ai-dir-down").disabled = true;
     document.getElementById("ai-status").classList.remove("hidden");
 
-    showSuccess("ai", `✅ AI narx boshqarish boshlandi: ${stock.symbol} ${direction === "up" ? "📈" : "📉"} ${percentage}%`);
+    showSuccess("ai", `✅ AI narx boshqarish boshlandi: ${s.symbol} ${direction === "up" ? "📈" : "📉"} ${percentage}%`);
 
     // AI loop boshlash
-    runAIPriceUpdate();
-    aiPriceControlState.intervalId = setInterval(runAIPriceUpdate, aiPriceControlState.updateIntervalMs);
+    startAIBackgroundLoop();
 
   } catch (e) {
     showErr("ai", "Xatolik: " + e.message);
@@ -233,6 +339,16 @@ window.startAIPriceControl = async function() {
     aiPriceControlState.running = false;
   }
 };
+
+// ── AI BACKGROUND LOOP (tab yopilsa ham ishlab turadi) ──
+function startAIBackgroundLoop() {
+  if (aiPriceControlState.intervalId) {
+    clearInterval(aiPriceControlState.intervalId);
+  }
+  
+  runAIPriceUpdate();
+  aiPriceControlState.intervalId = setInterval(runAIPriceUpdate, aiPriceControlState.updateIntervalMs);
+}
 
 // ── AI NARX BOSHQARUVNI TUGATISH ──────────────
 window.stopAIPriceControl = async function() {
@@ -267,6 +383,7 @@ window.stopAIPriceControl = async function() {
     // State reset
     aiPriceControlState.running = false;
     aiPriceControlState.intervalId = null;
+    clearAIStateFromStorage();
 
     // UI reset
     document.getElementById("btn-ai-start").disabled = false;
@@ -290,7 +407,7 @@ window.stopAIPriceControl = async function() {
   setLoad("btn-ai-stop", "ai-stop-loader", false);
 };
 
-// ── AI NARX YANGILASH LOOP ────────────────────
+// ── AI NARX YANGILASH LOOP (background safe) ──
 async function runAIPriceUpdate() {
   if (!aiPriceControlState.running) return;
 
@@ -316,26 +433,24 @@ async function runAIPriceUpdate() {
     displayTime = `${remainingSeconds}s`;
   }
   
-  document.getElementById("ai-remaining-time").textContent = displayTime;
+  // UI update (agar sahifa visible bo'lsa)
+  if (!document.hidden) {
+    document.getElementById("ai-remaining-time").textContent = displayTime;
+  }
 
   // AI narx hisoblash
   let currentPrice = aiPriceControlState.initialPrice;
-  
-  // Natural progress curve + kuchli silkinishlar
   let adjustedProgress = progress;
   
-  // Ba'zida kuchli o'zgarish (silkinish) - random 10-15% imkoniyat
+  // Ba'zida kuchli o'zgarish
   const rand = Math.random();
   if (rand < 0.12) {
-    // Kuchli silkinish: ± 5-15% extra
     const volatility = (Math.random() - 0.5) * 0.15;
     adjustedProgress = Math.min(progress + volatility, 1);
     adjustedProgress = Math.max(adjustedProgress, 0);
   } else if (rand < 0.25) {
-    // Yoqim o'zgarish: slightly less progress
     adjustedProgress = progress * 0.85;
   } else {
-    // Normal o'zgarish: smooth lerp
     adjustedProgress = progress;
   }
 
@@ -347,25 +462,27 @@ async function runAIPriceUpdate() {
       (aiPriceControlState.initialPrice - aiPriceControlState.targetPrice) * adjustedProgress;
   }
 
-  // Price validation
   currentPrice = Math.max(currentPrice, 0.00000001);
 
-  // Firebase-ga update
+  // Firebase-ga update (BACKGROUND MODE-DA HAM)
   try {
     const stock = stocksCache.find(s => s.id === aiPriceControlState.stockId);
     if (stock) {
-      const change24h = ((currentPrice - stock.price) / stock.price) * 100;
-      
       await updateDoc(doc(db, "stocks", aiPriceControlState.stockId), {
         price: currentPrice,
         priceHistory: arrayUnion({ price: currentPrice, ts: Date.now() }),
         updatedAt: serverTimestamp()
       });
 
-      // UI status yangilash
-      document.getElementById("ai-status-text").textContent = 
-        `${aiPriceControlState.direction === "up" ? "📈 Ko'tarilmoqda" : "📉 Tushirilmoqda"}`;
-      document.getElementById("ai-current-price").textContent = `$${fmtPrice(currentPrice)}`;
+      // UI update (agar visible bo'lsa)
+      if (!document.hidden) {
+        document.getElementById("ai-status-text").textContent = 
+          `${aiPriceControlState.direction === "up" ? "📈 Ko'tarilmoqda" : "📉 Tushirilmoqda"}`;
+        document.getElementById("ai-current-price").textContent = `$${fmtPrice(currentPrice)}`;
+      }
+      
+      // localStorage-ga update (background mode uchun)
+      saveAIStateToStorage(aiPriceControlState);
     }
   } catch (e) {
     console.error("AI update xatolik:", e);
@@ -405,7 +522,6 @@ window.createStock = async function() {
       createdAt: serverTimestamp()
     });
 
-    // Formni tozalash
     ["new-symbol","new-name","new-emoji","new-desc"].forEach(id => {
       document.getElementById(id).value = "";
     });
@@ -456,7 +572,6 @@ window.changePrice = async function(direction) {
       `${arrow} ${s.symbol} narxi ${pctRaw}% ${direction==="up"?"ko'tarildi":"tushirildi"} → $${fmtPrice(newPrice)}`);
     await loadAdminStocks();
 
-    // select'ni yangilash
     document.getElementById("price-select").value = sid;
     document.getElementById("price-select").dispatchEvent(new Event("change"));
   } catch (e) {
