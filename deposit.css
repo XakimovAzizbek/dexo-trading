@@ -1,0 +1,84 @@
+/* ============================================
+   DEXO TRADING — Deposit Styles
+============================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-deep:#080c14;--bg-card:#0d1420;--bg-surface:#111c2d;
+  --accent:#00d4aa;--accent-dim:#00d4aa18;--accent-glow:#00d4aa35;
+  --up:#00c896;--down:#f04f5a;--warn:#f5a623;
+  --t1:#e8edf5;--t2:#8a95a8;--t3:#3d4f64;--border:#1e2d42;
+  --font-main:'Space Grotesk',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+html{font-size:16px}
+body{background:var(--bg-deep);color:var(--t1);font-family:var(--font-main);min-height:100vh;overflow-x:hidden}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:52px 52px;opacity:.22;pointer-events:none;z-index:0}
+
+.top-header{position:fixed;top:0;left:0;right:0;height:58px;background:#080c14ee;backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:200}
+.back-btn{width:36px;height:36px;background:var(--bg-surface);border:1px solid var(--border);border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t1);transition:border-color .2s}
+.back-btn:hover{border-color:var(--accent)}
+.back-btn svg{width:20px;height:20px}
+.header-title{font-size:16px;font-weight:700;color:var(--t1)}
+.header-spacer{width:36px}
+
+.page-content{position:relative;z-index:10;padding:74px 16px 20px;max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+
+.balance-mini{display:flex;justify-content:space-between;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--t2)}
+.balance-mini span:last-child{color:var(--accent);font-weight:700;font-family:var(--font-mono)}
+
+.section-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:18px 16px}
+.field-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t2);margin-bottom:8px}
+
+select{width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:9px;padding:12px 13px;font-family:var(--font-main);font-size:14px;color:var(--t1);outline:none;cursor:pointer;transition:border-color .2s}
+select:focus{border-color:var(--accent)}
+select option{background:var(--bg-surface)}
+
+.hint-text{font-size:12px;color:var(--warn);margin-top:10px;line-height:1.5}
+
+.address-card{text-align:center}
+.qr-wrap{display:flex;justify-content:center;margin:10px 0 16px}
+.qr-placeholder{width:160px;height:160px;background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:48px}
+
+.address-box{display:flex;align-items:center;gap:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+.address-box span{flex:1;font-family:var(--font-mono);font-size:12px;color:var(--t1);word-break:break-all;text-align:left}
+.copy-btn{background:var(--accent-dim);border:1px solid var(--accent);border-radius:7px;padding:7px 12px;font-size:11px;font-weight:700;color:var(--accent);cursor:pointer;flex-shrink:0;transition:opacity .2s}
+.copy-btn:hover{opacity:.8}
+.copy-msg{font-size:12px;color:var(--up);margin-top:8px;min-height:0}
+
+.amount-input-wrap{position:relative;display:flex;align-items:center}
+.amount-input-wrap input{width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:9px;padding:12px 60px 12px 14px;font-family:var(--font-mono);font-size:16px;font-weight:600;color:var(--t1);outline:none;transition:border-color .2s}
+.amount-input-wrap input:focus{border-color:var(--accent)}
+.amount-input-wrap input::placeholder{color:var(--t3);font-weight:400}
+.amt-suffix{position:absolute;right:13px;font-size:12px;font-weight:700;font-family:var(--font-mono);color:var(--t2)}
+
+.text-input{width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:9px;padding:12px 13px;font-family:var(--font-mono);font-size:13px;color:var(--t1);outline:none;transition:border-color .2s}
+.text-input:focus{border-color:var(--accent)}
+.text-input::placeholder{color:var(--t3)}
+
+.msg-box{font-size:13px;font-weight:500;text-align:center;display:none;padding:10px;border-radius:8px}
+.msg-box.show{display:block}
+.msg-box.error{color:var(--down);background:#f04f5a14;border:1px solid #f04f5a30}
+.msg-box.success{color:var(--up);background:#00c89614;border:1px solid #00c89630}
+
+.btn-submit{width:100%;background:var(--accent);color:#071210;border:none;border-radius:11px;padding:15px;font-family:var(--font-main);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s,transform .15s}
+.btn-submit:hover{opacity:.88;transform:translateY(-1px)}
+.btn-submit:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-loader{width:18px;height:18px;border:2px solid #ffffff40;border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.btn-loader.hidden{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.info-box{background:var(--accent-dim);border:1px solid var(--accent-glow);border-radius:10px;padding:13px 14px;display:flex;gap:10px;align-items:flex-start}
+.info-box p{font-size:12px;color:var(--t2);line-height:1.6}
+
+.section-title{font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);font-family:var(--font-mono)}
+
+#deposit-history{display:flex;flex-direction:column;gap:8px}
+.dep-row{display:flex;align-items:center;gap:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:11px;padding:12px 14px}
+.dep-status{font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;font-family:var(--font-mono);flex-shrink:0}
+.dep-status.pending{background:#f5a62320;color:var(--warn)}
+.dep-status.approved{background:#00c89620;color:var(--up)}
+.dep-status.rejected{background:#f04f5a20;color:var(--down)}
+.dep-info{flex:1}
+.dep-amount{font-size:14px;font-weight:600;color:var(--t1);font-family:var(--font-mono)}
+.dep-date{font-size:11px;color:var(--t2);font-family:var(--font-mono);margin-top:1px}
+
+.empty-state{text-align:center;padding:24px;color:var(--t3);font-size:13px}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DEXO TRADING — Depozit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="deposit.css"/>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<header class="top-header">
+  <button class="back-btn" onclick="window.location.href='profile.html'" type="button">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <span class="header-title">Depozit</span>
+  <div class="header-spacer"></div>
+</header>
+
+<main class="page-content">
+
+  <div class="balance-mini">
+    <span>Joriy balans:</span>
+    <span id="current-balance">$0.00 USDT</span>
+  </div>
+
+  <!-- Tarmoq tanlash -->
+  <div class="section-card">
+    <div class="field-label">To'lov tarmog'i</div>
+    <select id="network-select">
+      <option value="TRC20">USDT (TRC20) — Tron</option>
+      <option value="BEP20">USDT (BEP20) — BNB Smart Chain</option>
+      <option value="ERC20">USDT (ERC20) — Ethereum</option>
+    </select>
+    <p class="hint-text">⚠️ Faqat tanlangan tarmoq orqali yuboring, aks holda mablag' yo'qoladi.</p>
+  </div>
+
+  <!-- Manzil / QR -->
+  <div class="section-card address-card">
+    <div class="field-label">Depozit manzili</div>
+    <div class="qr-wrap">
+      <div class="qr-placeholder" id="qr-placeholder">📱</div>
+    </div>
+    <div class="address-box">
+      <span id="deposit-address">Yuklanmoqda...</span>
+      <button class="copy-btn" onclick="copyAddress()" type="button">Nusxa olish</button>
+    </div>
+    <div id="copy-msg" class="copy-msg"></div>
+  </div>
+
+  <!-- Miqdor kiritish (admin tasdiqlash uchun) -->
+  <div class="section-card">
+    <div class="field-label">Yubordingiz miqdor (USDT)</div>
+    <div class="amount-input-wrap">
+      <input type="number" id="deposit-amount" placeholder="min 1.00" min="1" step="0.01"/>
+      <span class="amt-suffix">USDT</span>
+    </div>
+    <div class="field-label" style="margin-top:14px">Tranzaksiya hash / ID (ixtiyoriy)</div>
+    <input type="text" id="tx-hash" class="text-input" placeholder="0xabc123... yoki tranzaksiya ID"/>
+  </div>
+
+  <div id="deposit-error" class="msg-box error"></div>
+  <div id="deposit-success" class="msg-box success"></div>
+
+  <button class="btn-submit" id="btn-submit" onclick="submitDeposit()" type="button">
+    <span id="btn-text">So'rov yuborish</span>
+    <span class="btn-loader hidden" id="btn-loader"></span>
+  </button>
+
+  <!-- Ko'rsatma -->
+  <div class="info-box">
+    <span class="info-icon">ℹ️</span>
+    <p>To'lovni yuborgandan keyin "So'rov yuborish" tugmasini bosing. Admin tasdiqlagandan so'ng balansingiz yangilanadi (odatda 5-30 daqiqa).</p>
+  </div>
+
+  <!-- So'rovlar tarixi -->
+  <div class="section-title">Depozit tarixi</div>
+  <div id="deposit-history">
+    <div class="empty-state"><p>Hali depozit so'rovi yo'q</p></div>
+  </div>
+
+  <div style="height:40px"></div>
+</main>
+
+<script type="module" src="deposit.js"></script>
+</body>
+</html>
