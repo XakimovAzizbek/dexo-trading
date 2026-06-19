@@ -53,13 +53,12 @@ async function loadUserData(uid) {
   try {
     const snap = await getDoc(doc(db, "users", uid));
     if (!snap.exists()) return;
-    const data     = snap.data();
-    const balance  = data.balance || 0;
+    const data      = snap.data();
+    const balance   = Number(data.balance) || 0;
     const portfolio = data.portfolio || {};
 
-    // Balans — USDT, 8 xona aniqlik
-    document.querySelector(".bal-int").textContent = formatUSDT(balance);
-    document.querySelector(".bal-cur").textContent = "USDT";
+    // ── USDT balansni ko'rsatish ──
+    document.getElementById("bal-amount").textContent = fmtUSDT(balance);
 
     const stockCount = Object.keys(portfolio).length;
     document.getElementById("stat-stocks").textContent = stockCount;
@@ -67,9 +66,11 @@ async function loadUserData(uid) {
     if (stockCount > 0) {
       const pVal = await calcPortfolioValue(portfolio);
       document.getElementById("portfolio-value").textContent =
-        (pVal >= 0 ? "+" : "") + formatUSDT(pVal) + " USDT";
+        "$" + fmtUSDT(pVal) + " USDT";
+    } else {
+      document.getElementById("portfolio-value").textContent = "$0.00 USDT";
     }
-  } catch (e) { console.error(e); }
+  } catch (e) { console.error("loadUserData:", e); }
 }
 
 async function calcPortfolioValue(portfolio) {
@@ -77,7 +78,7 @@ async function calcPortfolioValue(portfolio) {
   for (const [stockId, qty] of Object.entries(portfolio)) {
     try {
       const s = await getDoc(doc(db, "stocks", stockId));
-      if (s.exists()) total += (s.data().price || 0) * qty;
+      if (s.exists()) total += (Number(s.data().price) || 0) * Number(qty);
     } catch (_) {}
   }
   return total;
@@ -94,26 +95,26 @@ async function loadHotStocks() {
     }
     container.innerHTML = "";
     snap.forEach(d => {
-      const s = d.data(); const sid = d.id;
+      const s = d.data();
       const change = s.change24h || 0;
       const isUp   = change >= 0;
       const el = document.createElement("a");
       el.className = "stock-item";
-      el.href = `chart.html?id=${sid}`;
+      el.href = `chart.html?id=${d.id}`;
       el.innerHTML = `
-        <div class="stock-icon">${s.emoji || "📊"}</div>
+        <div class="stock-icon">${esc(s.emoji || "📊")}</div>
         <div class="stock-info">
           <div class="stock-name">${esc(s.symbol)}</div>
           <div class="stock-company">${esc(s.name)}</div>
         </div>
         <div class="stock-right">
-          <div class="stock-price">$${formatUSDT(s.price)}</div>
+          <div class="stock-price">$${fmtPrice(s.price)}</div>
           <span class="stock-change ${isUp?"up":"down"}">${isUp?"+":""}${change.toFixed(2)}%</span>
         </div>`;
       container.appendChild(el);
     });
   } catch (e) {
-    container.innerHTML = emptyHTML("Yuklashda xatolik"); console.error(e);
+    container.innerHTML = emptyHTML("Yuklashda xatolik");
   }
 }
 
@@ -136,15 +137,15 @@ async function loadRecentTx(uid) {
       el.innerHTML = `
         <div class="tx-icon ${isBuy?"buy":"sell"}">
           ${isBuy
-            ? `<svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`
-            : `<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M19 12l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`}
+            ?`<svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`
+            :`<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M19 12l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`}
         </div>
         <div class="tx-info">
-          <div class="tx-name">${esc(t.stockName || t.stockId)}</div>
+          <div class="tx-name">${esc(t.stockName||t.stockId)}</div>
           <div class="tx-date">${date} · ${t.qty} ta</div>
         </div>
         <div class="tx-amount ${isBuy?"buy":"sell"}">
-          ${isBuy?"-":"+"}$${formatUSDT(t.total)}
+          ${isBuy?"-":"+"}$${fmtUSDT(t.total)}
         </div>`;
       container.appendChild(el);
     });
@@ -153,13 +154,16 @@ async function loadRecentTx(uid) {
 }
 
 // ── Utils ────────────────────────────────────
-function formatUSDT(n) {
+function fmtUSDT(n) {
   const num = Number(n) || 0;
-  // 8 xona aniqlik, keraksiz nollarni kesib
   return num < 0.01 ? num.toFixed(8) : num.toFixed(2);
 }
+function fmtPrice(n) {
+  const num = Number(n) || 0;
+  return num < 0.01 ? num.toFixed(8) : num.toFixed(4);
+}
 function fmtDate(d) {
-  return d.toLocaleDateString("uz-UZ", {day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
+  return d.toLocaleDateString("uz-UZ",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
 }
 function esc(str) {
   return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
