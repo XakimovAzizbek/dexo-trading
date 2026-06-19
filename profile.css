@@ -1,0 +1,114 @@
+/* ============================================
+   DEXO TRADING — Profile Styles
+============================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-deep:#080c14;--bg-card:#0d1420;--bg-surface:#111c2d;
+  --accent:#00d4aa;--accent-dim:#00d4aa18;--accent-glow:#00d4aa35;
+  --up:#00c896;--down:#f04f5a;
+  --t1:#e8edf5;--t2:#8a95a8;--t3:#3d4f64;--border:#1e2d42;
+  --font-main:'Space Grotesk',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --nav-h:68px;--header-h:58px;
+}
+html{font-size:16px}
+body{background:var(--bg-deep);color:var(--t1);font-family:var(--font-main);min-height:100vh;overflow-x:hidden}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:52px 52px;opacity:.22;pointer-events:none;z-index:0}
+
+/* HEADER */
+.top-header{position:fixed;top:0;left:0;right:0;height:var(--header-h);background:#080c14ee;backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:200}
+.header-left{display:flex;align-items:center;gap:10px}
+.logo-icon-sm{width:32px;height:32px;background:var(--accent-dim);border:1px solid var(--accent-glow);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.header-brand{font-size:16px;font-weight:700;letter-spacing:.08em;color:var(--t1)}
+.menu-btn{width:36px;height:36px;background:var(--bg-surface);border:1px solid var(--border);border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t1);transition:border-color .2s}
+.menu-btn:hover{border-color:var(--accent)}
+.menu-btn svg{width:20px;height:20px}
+
+/* CONTENT */
+.page-content{position:relative;z-index:10;padding:calc(var(--header-h)+18px) 16px 18px;max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+
+/* USER CARD */
+.user-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 0 4px}
+.user-avatar-wrap{width:78px;height:78px;border-radius:50%;background:var(--bg-card);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 24px var(--accent-glow)}
+.user-avatar{width:100%;height:100%;object-fit:cover}
+.user-avatar.hidden{display:none}
+.user-initials{font-size:28px;font-weight:700;font-family:var(--font-mono);color:var(--accent)}
+.user-name{font-size:17px;font-weight:700;color:var(--t1);margin-top:6px}
+.user-email{font-size:12px;color:var(--t2);font-family:var(--font-mono)}
+
+/* BALANCE CARD */
+.balance-card{background:linear-gradient(135deg,#0d1f35 0%,#071812 100%);border:1px solid #1a3a4a;border-radius:20px;padding:26px 22px 22px;position:relative;overflow:hidden}
+.balance-card::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,var(--accent-glow),transparent 70%);pointer-events:none}
+.balance-label{font-size:12px;font-family:var(--font-mono);letter-spacing:.12em;color:var(--t2);text-transform:uppercase;margin-bottom:10px}
+.balance-amount{display:flex;align-items:baseline;gap:2px;margin-bottom:10px}
+.bal-dollar{font-size:20px;font-weight:500;color:var(--t2);font-family:var(--font-mono)}
+.bal-int{font-size:32px;font-weight:700;color:var(--t1);font-family:var(--font-mono);letter-spacing:-.02em}
+.bal-cur{font-size:13px;font-weight:700;color:var(--accent);font-family:var(--font-mono);margin-left:8px;letter-spacing:.08em}
+.balance-meta{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.bal-tag{font-size:12px;color:var(--t3)}
+.bal-port{font-size:12px;font-family:var(--font-mono);color:var(--t1);font-weight:600}
+.bal-pl{font-size:11px;font-family:var(--font-mono);font-weight:700;padding:2px 8px;border-radius:20px}
+.bal-pl.up{color:var(--up);background:#00c89618}
+.bal-pl.down{color:var(--down);background:#f04f5a18}
+.bal-pl.neutral{color:var(--t2);background:var(--bg-surface)}
+
+.balance-actions{display:flex;gap:10px}
+.bal-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;border:none;border-radius:10px;padding:13px 10px;font-family:var(--font-main);font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s,transform .15s}
+.bal-btn svg{width:16px;height:16px}
+.bal-btn:hover{opacity:.88;transform:translateY(-1px)}
+.bal-btn.deposit{background:var(--accent);color:#071210}
+.bal-btn.withdraw{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.bal-btn.withdraw:hover{background:var(--accent-dim)}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 10px;text-align:center}
+.stat-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-family:var(--font-mono)}
+.stat-val{font-size:18px;font-weight:700;color:var(--t1);font-family:var(--font-mono)}
+.stat-val.up{color:var(--up)}.stat-val.down{color:var(--down)}
+
+/* MORE BUTTON */
+.more-btn{width:100%;display:flex;align-items:center;gap:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;cursor:pointer;color:var(--t1);font-family:var(--font-main);transition:border-color .2s}
+.more-btn:hover{border-color:var(--accent)}
+.more-icon{font-size:18px}
+.more-text{flex:1;text-align:left;font-size:15px;font-weight:600}
+.more-chevron{width:18px;height:18px;color:var(--t2)}
+
+/* SECTION TITLE */
+.section-title{font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);font-family:var(--font-mono);margin-bottom:-6px}
+
+/* HOLDINGS LIST */
+.holdings-list{display:flex;flex-direction:column;gap:10px}
+.holding-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--t1);transition:border-color .2s,transform .15s}
+.holding-card:hover{border-color:var(--accent);transform:translateX(2px)}
+.hc-icon{width:42px;height:42px;border-radius:10px;background:var(--bg-surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.hc-info{flex:1;min-width:0}
+.hc-symbol{font-size:15px;font-weight:700;color:var(--t1)}
+.hc-qty{font-size:12px;color:var(--t2);font-family:var(--font-mono);margin-top:2px}
+.hc-right{text-align:right;flex-shrink:0}
+.hc-value{font-size:15px;font-weight:600;font-family:var(--font-mono);color:var(--t1);margin-bottom:3px}
+.hc-pl{font-size:12px;font-family:var(--font-mono);font-weight:700;padding:2px 8px;border-radius:20px;display:inline-block}
+.hc-pl.up{color:var(--up);background:#00c89618}
+.hc-pl.down{color:var(--down);background:#f04f5a18}
+.hc-pl.neutral{color:var(--t2);background:var(--bg-surface)}
+
+.stock-skeleton{height:76px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+.empty-state{text-align:center;padding:40px 20px;color:var(--t3)}
+.empty-state svg{width:48px;height:48px;margin-bottom:12px}
+.empty-state p{font-size:13px}
+.empty-state a{color:var(--accent);font-weight:600;text-decoration:none}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:#0a1220f0;backdrop-filter:blur(16px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;z-index:200;padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;text-decoration:none;color:var(--t3);font-size:11px;font-weight:500;letter-spacing:.04em;transition:color .2s;padding:8px 0;position:relative}
+.nav-item svg{width:22px;height:22px;stroke:currentColor}
+.nav-item.active{color:var(--accent)}
+.nav-item.active::before{content:'';position:absolute;top:0;width:28px;height:2px;background:var(--accent);border-radius:0 0 4px 4px;box-shadow:0 0 8px var(--accent-glow)}
+.nav-item:hover:not(.active){color:var(--t2)}
+
+@media(max-width:380px){
+  .bal-int{font-size:26px}
+  .stats-row{gap:8px}
+  .stat-val{font-size:15px}
+}
