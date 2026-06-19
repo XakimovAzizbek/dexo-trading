@@ -31,27 +31,29 @@
 
 <main class="page-content">
 
-  <!-- AKSIYA TANLASH / PAIR BAR -->
-  <div class="pair-bar">
-    <button class="pair-select-btn" id="pair-select-btn" onclick="togglePairList()">
+  <!-- ═══ AKSIYA TANLASH / PAIR BAR — har doim ko'rinadi ═══ -->
+  <button class="pair-bar" id="pair-select-btn" onclick="togglePairList()" type="button">
+    <div class="pair-left">
       <span class="psb-icon" id="psb-icon">📊</span>
       <span class="psb-symbol" id="psb-symbol">Aksiya tanlang</span>
       <span class="psb-usdt">/USDT</span>
-      <svg class="psb-chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
+      <svg class="psb-chevron" id="psb-chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
     <div class="pair-price-block">
       <span class="ppb-price" id="ppb-price">$0.00</span>
-      <span class="ppb-change" id="ppb-change">0.00%</span>
+      <span class="ppb-change neutral" id="ppb-change">0.00%</span>
     </div>
-  </div>
+  </button>
 
   <!-- Pair dropdown list -->
   <div class="pair-list hidden" id="pair-list">
     <div class="pair-list-search">
       <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5" stroke="#6b7a8d" stroke-width="1.5"/><path d="M14 14l3 3" stroke="#6b7a8d" stroke-width="1.5" stroke-linecap="round"/></svg>
-      <input type="text" id="pair-search" placeholder="Aksiya qidirish..." oninput="renderPairList()"/>
+      <input type="text" id="pair-search" placeholder="Aksiya qidirish..."/>
     </div>
-    <div id="pair-list-items"></div>
+    <div id="pair-list-items">
+      <div class="empty-state">Yuklanmoqda...</div>
+    </div>
   </div>
 
   <!-- MARKET STATS -->
@@ -70,16 +72,16 @@
     </div>
   </div>
 
-  <!-- MINI CHART LINK -->
-  <a class="chart-link" id="chart-link" href="#">
+  <!-- TO'LIQ GRAFIK LINK -->
+  <a class="chart-link" id="chart-link" href="javascript:void(0)">
     <span>📈 To'liq grafikni ko'rish</span>
     <svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </a>
 
   <!-- BUY / SELL TABS -->
   <div class="trade-tabs">
-    <button class="ttab buy active" id="tab-buy" onclick="setTradeTab('buy')">Sotib olish</button>
-    <button class="ttab sell" id="tab-sell" onclick="setTradeTab('sell')">Sotish</button>
+    <button class="ttab buy active" id="tab-buy" onclick="setTradeTab('buy')" type="button">Sotib olish</button>
+    <button class="ttab sell" id="tab-sell" onclick="setTradeTab('sell')" type="button">Sotish</button>
   </div>
 
   <!-- TRADE PANEL -->
@@ -101,16 +103,16 @@
     <div class="tp-field">
       <label id="amount-field-label">Miqdor (USDT)</label>
       <div class="tp-input-wrap">
-        <input type="number" id="amount-input" placeholder="min 1.00" min="1" step="0.01" oninput="updateCalculation()"/>
+        <input type="number" id="amount-input" placeholder="min 1.00" min="0" step="0.01" inputmode="decimal"/>
         <span class="tp-suffix" id="amount-suffix">USDT</span>
       </div>
     </div>
 
     <div class="pct-row">
-      <button onclick="setPct(25)">25%</button>
-      <button onclick="setPct(50)">50%</button>
-      <button onclick="setPct(75)">75%</button>
-      <button onclick="setPct(100)">100%</button>
+      <button type="button" onclick="setPct(25)">25%</button>
+      <button type="button" onclick="setPct(50)">50%</button>
+      <button type="button" onclick="setPct(75)">75%</button>
+      <button type="button" onclick="setPct(100)">100%</button>
     </div>
 
     <div class="tp-summary" id="tp-summary">
@@ -127,7 +129,7 @@
     <div id="trade-error" class="trade-msg error"></div>
     <div id="trade-success" class="trade-msg success"></div>
 
-    <button class="btn-execute buy" id="btn-execute" onclick="executeTrade()">
+    <button class="btn-execute buy" id="btn-execute" onclick="executeTrade()" type="button">
       <span id="btn-execute-text">Sotib olish</span>
       <span class="btn-loader hidden" id="execute-loader"></span>
     </button>

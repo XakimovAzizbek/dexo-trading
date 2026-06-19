@@ -34,6 +34,15 @@ let currentStock  = null;
 let tradeMode     = "buy"; // "buy" | "sell"
 let stockUnsub    = null;
 
+// ── DOM tayyor bo'lgandan keyin event listenerlarni ulash ──
+document.addEventListener("DOMContentLoaded", () => {
+  const amountInput = document.getElementById("amount-input");
+  if (amountInput) amountInput.addEventListener("input", updateCalculation);
+
+  const searchInput = document.getElementById("pair-search");
+  if (searchInput) searchInput.addEventListener("input", renderPairList);
+});
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) { window.location.href = "login.html"; return; }
   currentUser = user;
@@ -44,45 +53,67 @@ onAuthStateChanged(auth, async (user) => {
   const params = new URLSearchParams(location.search);
   const sid    = params.get("id");
   const action = params.get("action");
-  if (sid) selectStock(sid);
+
+  if (sid) {
+    selectStock(sid);
+  } else if (allStocks.length > 0) {
+    // Hech narsa tanlanmagan bo'lsa — birinchi aksiyani avtomatik tanlash
+    selectStock(allStocks[0].id);
+  }
   if (action === "sell") setTradeTab("sell");
 });
 
 // ── Aksiyalarni yuklash ───────────────────────
 async function loadStocks() {
-  const snap = await getDocs(query(collection(db,"stocks"), orderBy("symbol")));
-  allStocks = [];
-  snap.forEach(d => allStocks.push({ id: d.id, ...d.data() }));
+  try {
+    const snap = await getDocs(query(collection(db,"stocks"), orderBy("symbol")));
+    allStocks = [];
+    snap.forEach(d => allStocks.push({ id: d.id, ...d.data() }));
+  } catch (e) {
+    console.error("Aksiyalarni yuklashda xatolik:", e);
+    allStocks = [];
+  }
   renderPairList();
 }
 
 // ── Foydalanuvchi balansi ────────────────────
 async function loadUserData() {
-  const snap = await getDoc(doc(db,"users",currentUser.uid));
-  if (!snap.exists()) return;
-  const d = snap.data();
-  userBalance   = Number(d.balance) || 0;
-  userPortfolio = d.portfolio || {};
-  document.getElementById("header-balance").textContent = "$" + fmt(userBalance);
-  updateAvailable();
-  renderHoldings();
+  try {
+    const snap = await getDoc(doc(db,"users",currentUser.uid));
+    if (!snap.exists()) return;
+    const d = snap.data();
+    userBalance   = Number(d.balance) || 0;
+    userPortfolio = d.portfolio || {};
+    document.getElementById("header-balance").textContent = "$" + fmt(userBalance);
+    updateAvailable();
+    renderHoldings();
+  } catch (e) { console.error("Foydalanuvchi ma'lumotini yuklashda xatolik:", e); }
 }
 
 // ══════════════════════════════════════════
 //  PAIR SELECTOR (dropdown)
 // ══════════════════════════════════════════
 window.togglePairList = function() {
-  const list = document.getElementById("pair-list");
-  const btn  = document.getElementById("pair-select-btn");
+  const list    = document.getElementById("pair-list");
+  const chevron = document.getElementById("psb-chevron");
   list.classList.toggle("hidden");
-  btn.classList.toggle("open");
+  chevron.classList.toggle("rotated");
 };
 
 window.renderPairList = function() {
-  const search    = (document.getElementById("pair-search").value || "").toLowerCase();
+  const searchInput = document.getElementById("pair-search");
+  const search    = (searchInput?.value || "").toLowerCase();
   const container = document.getElementById("pair-list-items");
-  const filtered  = allStocks.filter(s =>
-    !search || s.symbol.toLowerCase().includes(search) || s.name.toLowerCase().includes(search)
+
+  if (allStocks.length === 0) {
+    container.innerHTML = `<div class="empty-state">Hali aksiya mavjud emas.<br>Admin panelda aksiya qo'shing.</div>`;
+    return;
+  }
+
+  const filtered = allStocks.filter(s =>
+    !search ||
+    (s.symbol||"").toLowerCase().includes(search) ||
+    (s.name||"").toLowerCase().includes(search)
   );
 
   if (filtered.length === 0) {
@@ -96,7 +127,10 @@ window.renderPairList = function() {
     const isUp   = change >= 0;
     const row = document.createElement("div");
     row.className = "pair-row";
-    row.onclick = () => { selectStock(s.id); togglePairList(); };
+    row.addEventListener("click", () => {
+      selectStock(s.id);
+      togglePairList();
+    });
     row.innerHTML = `
       <div class="pr-icon">${esc(s.emoji||"📊")}</div>
       <div class="pr-info">
@@ -115,6 +149,7 @@ window.renderPairList = function() {
 //  AKSIYA TANLASH
 // ══════════════════════════════════════════
 function selectStock(sid) {
+  if (!sid) return;
   if (stockUnsub) { stockUnsub(); stockUnsub = null; }
 
   stockUnsub = onSnapshot(doc(db,"stocks",sid), (snap) => {
@@ -122,10 +157,18 @@ function selectStock(sid) {
     currentStock = { id: sid, ...snap.data() };
     updatePairBar();
     updateMarketStats();
-    document.getElementById("chart-link").href = `chart.html?id=${sid}`;
+    const chartLink = document.getElementById("chart-link");
+    chartLink.href = `chart.html?id=${sid}`;
+    chartLink.onclick = null;
     document.getElementById("price-display").value = fmtPrice(currentStock.price);
     updateCalculation();
     updateAvailable();
+    if (tradeMode === "sell") {
+      document.getElementById("amount-field-label").textContent = "Miqdor (" + currentStock.symbol + ")";
+      document.getElementById("amount-suffix").textContent      = currentStock.symbol;
+    }
+  }, (err) => {
+    console.error("Aksiya kuzatishda xatolik:", err);
   });
 }
 
@@ -211,10 +254,11 @@ window.setPct = function(pct) {
 // ══════════════════════════════════════════
 //  HISOBLASH
 // ══════════════════════════════════════════
-window.updateCalculation = function() {
+function updateCalculation() {
   clearMsgs();
   if (!currentStock) { resetSummary(); return; }
-  const input = parseFloat(document.getElementById("amount-input").value);
+  const inputEl = document.getElementById("amount-input");
+  const input   = parseFloat(inputEl.value);
   if (!input || input <= 0) { resetSummary(); return; }
 
   const price = currentStock.price;
@@ -233,7 +277,8 @@ window.updateCalculation = function() {
     document.getElementById("sum-total-label").textContent = "Olinadigan USDT:";
     document.getElementById("sum-total").textContent       = "$" + fmt(total) + " USDT";
   }
-};
+}
+window.updateCalculation = updateCalculation;
 
 function resetSummary() {
   document.getElementById("sum-receive").textContent = "—";

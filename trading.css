@@ -26,17 +26,25 @@ body{background:var(--bg-deep);color:var(--t1);font-family:var(--font-main);min-
 /* CONTENT */
 .page-content{position:relative;z-index:10;padding:calc(var(--header-h)+14px) 14px 14px;max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
 
-/* PAIR BAR */
-.pair-bar{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.pair-select-btn{flex:1;display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;color:var(--t1);padding:0}
-.psb-icon{font-size:18px}
-.psb-symbol{font-size:15px;font-weight:700;color:var(--t1)}
-.psb-usdt{font-size:13px;color:var(--t2);font-family:var(--font-mono)}
-.psb-chevron{width:16px;height:16px;color:var(--t2);transition:transform .2s}
-.pair-select-btn.open .psb-chevron{transform:rotate(180deg)}
+/* PAIR BAR (button) */
+.pair-bar{
+  width:100%;
+  background:var(--bg-card);border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  cursor:pointer;font-family:var(--font-main);color:var(--t1);
+  transition:border-color .2s;
+}
+.pair-bar:hover{border-color:var(--accent)}
+.pair-left{display:flex;align-items:center;gap:8px;min-width:0}
+.psb-icon{font-size:18px;flex-shrink:0}
+.psb-symbol{font-size:15px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.psb-usdt{font-size:13px;color:var(--t2);font-family:var(--font-mono);flex-shrink:0}
+.psb-chevron{width:16px;height:16px;color:var(--t2);transition:transform .2s;flex-shrink:0}
+.psb-chevron.rotated{transform:rotate(180deg)}
 .pair-price-block{text-align:right;flex-shrink:0}
 .ppb-price{display:block;font-size:15px;font-weight:700;font-family:var(--font-mono);color:var(--t1)}
-.ppb-change{font-size:11px;font-family:var(--font-mono);font-weight:600;padding:2px 7px;border-radius:20px}
+.ppb-change{font-size:11px;font-family:var(--font-mono);font-weight:600;padding:2px 7px;border-radius:20px;display:inline-block;margin-top:2px}
 .ppb-change.up{color:var(--up);background:#00c89618}
 .ppb-change.down{color:var(--down);background:#f04f5a18}
 .ppb-change.neutral{color:var(--t2);background:var(--bg-surface)}
@@ -45,7 +53,7 @@ body{background:var(--bg-deep);color:var(--t1);font-family:var(--font-main);min-
 .pair-list{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:12px;max-height:340px;overflow-y:auto;position:relative;z-index:250}
 .pair-list.hidden{display:none}
 .pair-list-search{position:relative;display:flex;align-items:center;margin-bottom:10px}
-.pair-list-search svg{position:absolute;left:10px;width:15px;height:15px}
+.pair-list-search svg{position:absolute;left:10px;width:15px;height:15px;pointer-events:none}
 .pair-list-search input{width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px 9px 32px;font-family:var(--font-main);font-size:13px;color:var(--t1);outline:none}
 .pair-list-search input:focus{border-color:var(--accent)}
 .pair-row{display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:8px;cursor:pointer;transition:background .15s}
@@ -86,7 +94,12 @@ body{background:var(--bg-deep);color:var(--t1);font-family:var(--font-main);min-
 
 .tp-field label{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:6px}
 .tp-input-wrap{position:relative;display:flex;align-items:center}
-.tp-input-wrap input{width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:9px;padding:12px 60px 12px 14px;font-family:var(--font-mono);font-size:16px;font-weight:600;color:var(--t1);outline:none;transition:border-color .2s}
+.tp-input-wrap input{
+  width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:9px;
+  padding:12px 60px 12px 14px;font-family:var(--font-mono);font-size:16px;font-weight:600;
+  color:var(--t1);outline:none;transition:border-color .2s;
+  -webkit-appearance:none;appearance:none;
+}
 .tp-input-wrap input:focus{border-color:var(--accent)}
 .tp-input-wrap input::placeholder{color:var(--t3);font-weight:400}
 .tp-input-wrap.disabled input{color:var(--t2);cursor:not-allowed}
