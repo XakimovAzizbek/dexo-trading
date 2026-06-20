@@ -1,0 +1,100 @@
+/* ============================================
+   DEXO TRADING — Staking Page Styles
+============================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-deep:#080c14;--bg-card:#0d1420;--bg-surface:#111c2d;
+  --accent:#00d4aa;--accent-dim:#00d4aa18;--accent-glow:#00d4aa35;
+  --up:#00c896;--down:#f04f5a;--warn:#f5a623;
+  --t1:#e8edf5;--t2:#8a95a8;--t3:#3d4f64;--border:#1e2d42;
+  --font-main:'Space Grotesk',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+html{font-size:16px}
+body{background:var(--bg-deep);color:var(--t1);font-family:var(--font-main);min-height:100vh;overflow-x:hidden}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:52px 52px;opacity:.22;pointer-events:none;z-index:0}
+.hidden{display:none!important}
+
+/* HEADER */
+.top-header{position:fixed;top:0;left:0;right:0;height:58px;background:#080c14ee;backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:200}
+.back-btn{width:36px;height:36px;background:var(--bg-surface);border:1px solid var(--border);border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t1)}
+.back-btn svg{width:20px;height:20px}
+.header-title{font-size:16px;font-weight:700;color:var(--t1)}
+.header-spacer{width:36px}
+
+/* CONTENT */
+.page-content{position:relative;z-index:10;padding:74px 16px 20px;max-width:600px;margin:0 auto}
+
+/* BALANCE HERO */
+.bal-hero{text-align:center;background:linear-gradient(160deg,#00d4aa15,#00c89608);border:1px solid var(--accent-glow);border-radius:18px;padding:24px 20px;margin-bottom:16px}
+.bh-label{font-size:12px;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;font-family:var(--font-mono);margin-bottom:10px}
+.bh-amount{font-size:32px;font-weight:700;font-family:var(--font-mono);color:var(--t1)}
+.bh-unit{font-size:14px;color:var(--t2);font-weight:500}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.stat-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.sb-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;font-family:var(--font-mono);margin-bottom:6px}
+.sb-val{font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--t1)}
+.sb-val.up{color:var(--up)}
+
+/* SECTION LABEL */
+.section-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin:0 4px 12px}
+
+/* PLANS GRID */
+.plans-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px}
+.plan-card{position:relative;background:var(--bg-card);border:1.5px solid var(--border);border-radius:14px;padding:18px 8px 14px;text-align:center;cursor:pointer;font-family:var(--font-main);transition:all .2s}
+.plan-card:hover{border-color:var(--accent-glow)}
+.plan-card.active{border-color:var(--accent);background:var(--accent-dim)}
+.pc-apy{font-size:20px;font-weight:700;font-family:var(--font-mono);color:var(--t1);margin-bottom:2px}
+.plan-card.active .pc-apy{color:var(--accent)}
+.pc-label{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.pc-days{font-size:12px;color:var(--t2);font-weight:600}
+.pc-popular{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--accent);color:#071210;font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+
+/* STAKE FORM */
+.stake-form{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:24px}
+.sf-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);margin-bottom:10px}
+.sf-input-row{display:flex;align-items:center;gap:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:4px 6px 4px 14px;margin-bottom:10px}
+.sf-input-row input{flex:1;background:transparent;border:none;outline:none;font-family:var(--font-mono);font-size:18px;font-weight:600;color:var(--t1);min-width:0;padding:10px 0}
+.sf-input-row input::placeholder{color:var(--t3)}
+.sf-unit{font-size:12px;color:var(--t2);font-family:var(--font-mono);font-weight:600}
+.sf-max{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-glow);border-radius:7px;padding:7px 11px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
+.sf-estimate{font-size:12.5px;color:var(--t2);margin-bottom:14px;padding:10px 12px;background:var(--bg-surface);border-radius:9px}
+.sf-estimate b{color:var(--up);font-family:var(--font-mono)}
+
+.error-msg{font-size:13px;color:var(--down);font-weight:500;display:none;margin-bottom:10px}
+.error-msg.show{display:block}
+.success-msg{font-size:13px;color:var(--up);font-weight:600;display:none;margin-top:12px;text-align:center}
+.success-msg.show{display:block}
+
+.btn-stake{width:100%;background:var(--accent);color:#071210;border:none;border-radius:11px;padding:15px;font-family:var(--font-main);font-size:14.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s,transform .15s}
+.btn-stake:hover{opacity:.88;transform:translateY(-1px)}
+.btn-stake:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-loader{width:16px;height:16px;border:2px solid #ffffff40;border-top-color:#071210;border-radius:50%;animation:spin .7s linear infinite}
+.btn-loader.hidden{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ACTIVE STAKES */
+#active-stakes{display:flex;flex-direction:column;gap:10px}
+.stake-card{background:var(--bg-card);border:1px solid var(--border);border-radius:15px;padding:16px 18px}
+.sc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.sc-amount{font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--t1)}
+.sc-plan{font-size:11px;color:var(--accent);font-weight:600;background:var(--accent-dim);padding:3px 9px;border-radius:20px;margin-top:4px;display:inline-block}
+.sc-reward{text-align:right}
+.sc-reward-label{font-size:9.5px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.sc-reward-val{font-size:14px;font-weight:700;font-family:var(--font-mono);color:var(--up)}
+
+.sc-progress-track{height:6px;background:var(--bg-surface);border-radius:6px;overflow:hidden;margin-bottom:8px}
+.sc-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--up));border-radius:6px;transition:width .3s}
+.sc-bottom{display:flex;justify-content:space-between;align-items:center}
+.sc-time-left{font-size:11.5px;color:var(--t2);font-family:var(--font-mono)}
+.sc-claim-btn{background:var(--up);color:#041a12;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .2s}
+.sc-claim-btn:hover{opacity:.85}
+.sc-claim-btn:disabled{background:var(--bg-surface);color:var(--t3);cursor:not-allowed}
+
+.stake-skeleton{height:110px;background:var(--bg-card);border:1px solid var(--border);border-radius:15px;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.empty-state{text-align:center;padding:36px 20px;color:var(--t3)}
+.empty-state svg{width:44px;height:44px;margin-bottom:12px;opacity:.5}
+.empty-state p{font-size:13px;color:var(--t2)}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DEXO — Staking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="staking.css"/>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<!-- HEADER -->
+<header class="top-header">
+  <button class="back-btn" onclick="window.location.href='more.html'">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <span class="header-title">Staking</span>
+  <div class="header-spacer"></div>
+</header>
+
+<!-- CONTENT -->
+<main class="page-content">
+
+  <!-- Balance hero -->
+  <div class="bal-hero">
+    <div class="bh-label">Mavjud balans</div>
+    <div class="bh-amount"><span id="bh-amount">0.00</span> <span class="bh-unit">USDT</span></div>
+  </div>
+
+  <!-- Total staked summary -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div name="sb-label" class="sb-label">Stakingda</div>
+      <div class="sb-val" id="sb-staked">$0.00</div>
+    </div>
+    <div class="stat-box">
+      <div class="sb-label">Kutilayotgan foyda</div>
+      <div class="sb-val up" id="sb-rewards">$0.00</div>
+    </div>
+  </div>
+
+  <!-- Plans -->
+  <div class="section-label">Reja tanlang</div>
+  <div class="plans-grid" id="plans-grid">
+    <button class="plan-card" data-days="7" data-apy="5" onclick="selectPlan(this)">
+      <div class="pc-apy">5%</div>
+      <div class="pc-label">APY</div>
+      <div class="pc-days">7 kun</div>
+    </button>
+    <button class="plan-card" data-days="30" data-apy="12" onclick="selectPlan(this)">
+      <div class="pc-apy">12%</div>
+      <div class="pc-label">APY</div>
+      <div class="pc-days">30 kun</div>
+    </button>
+    <button class="plan-card active" data-days="90" data-apy="25" onclick="selectPlan(this)">
+      <div class="pc-popular">Mashxur</div>
+      <div class="pc-apy">25%</div>
+      <div class="pc-label">APY</div>
+      <div class="pc-days">90 kun</div>
+    </button>
+  </div>
+
+  <!-- Stake form -->
+  <div class="stake-form">
+    <div class="sf-label">Stake miqdori</div>
+    <div class="sf-input-row">
+      <input type="number" id="stake-amount" placeholder="0.00" min="0" step="0.01"/>
+      <span class="sf-unit">USDT</span>
+      <button class="sf-max" onclick="setMaxAmount()">MAX</button>
+    </div>
+    <div class="sf-estimate" id="sf-estimate">Taxminiy daromad: <b>$0.00</b> (90 kunda)</div>
+    <div id="stake-error" class="error-msg"></div>
+    <button class="btn-stake" id="btn-stake" onclick="createStake()">
+      <span class="btn-text">Stake qilish</span>
+      <span class="btn-loader hidden" id="stake-loader"></span>
+    </button>
+    <div id="stake-success" class="success-msg"></div>
+  </div>
+
+  <!-- Active stakes -->
+  <div class="section-label">Faol depozitlar</div>
+  <div id="active-stakes">
+    <div class="stake-skeleton"></div>
+  </div>
+
+  <div style="height:30px"></div>
+</main>
+
+<script type="module" src="staking.js"></script>
+</body>
+</html>
