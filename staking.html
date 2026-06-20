@@ -30,60 +30,71 @@
     <div class="bh-amount"><span id="bh-amount">0.00</span> <span class="bh-unit">USDT</span></div>
   </div>
 
-  <!-- Total staked summary -->
+  <!-- Main Staking Card -->
+  <div class="stake-main-card">
+    <div class="smc-apy-row">
+      <div class="smc-apy-badge">
+        <span class="smc-apy-num">10%</span>
+        <span class="smc-apy-label">Yillik foiz (APY)</span>
+      </div>
+      <div class="smc-status" id="smc-status">Faol emas</div>
+    </div>
+
+    <div class="smc-divider"></div>
+
+    <div class="smc-row">
+      <div class="smc-col">
+        <div class="smc-label">Bog'langan mablag'</div>
+        <div class="smc-principal" id="smc-principal">$0.00</div>
+      </div>
+      <div class="smc-col right">
+        <div class="smc-label">Boshlangan</div>
+        <div class="smc-date" id="smc-date">—</div>
+      </div>
+    </div>
+
+    <div class="smc-reward-box">
+      <div class="smc-reward-label">
+        <span class="live-dot"></span> Jamlangan daromad (har sekund o'sadi)
+      </div>
+      <div class="smc-reward-live" id="smc-reward-live">$0.00000000</div>
+    </div>
+
+    <button class="btn-claim" id="btn-claim" onclick="claimReward()" disabled>
+      <span class="btn-text" id="claim-btn-text">Daromad yo'q</span>
+      <span class="btn-loader hidden" id="claim-loader"></span>
+    </button>
+    <div class="claim-hint" id="claim-hint">Claim har 24 soatda bir marta mumkin</div>
+  </div>
+
+  <!-- Stats -->
   <div class="stats-grid">
     <div class="stat-box">
-      <div name="sb-label" class="sb-label">Stakingda</div>
-      <div class="sb-val" id="sb-staked">$0.00</div>
+      <div class="sb-label">Kunlik (taxminiy)</div>
+      <div class="sb-val up" id="sb-daily">$0.00</div>
     </div>
     <div class="stat-box">
-      <div class="sb-label">Kutilayotgan foyda</div>
-      <div class="sb-val up" id="sb-rewards">$0.00</div>
+      <div class="sb-label">Jami olingan</div>
+      <div class="sb-val" id="sb-claimed">$0.00</div>
     </div>
   </div>
 
-  <!-- Plans -->
-  <div class="section-label">Reja tanlang</div>
-  <div class="plans-grid" id="plans-grid">
-    <button class="plan-card" data-days="7" data-apy="5" onclick="selectPlan(this)">
-      <div class="pc-apy">5%</div>
-      <div class="pc-label">APY</div>
-      <div class="pc-days">7 kun</div>
-    </button>
-    <button class="plan-card" data-days="30" data-apy="12" onclick="selectPlan(this)">
-      <div class="pc-apy">12%</div>
-      <div class="pc-label">APY</div>
-      <div class="pc-days">30 kun</div>
-    </button>
-    <button class="plan-card active" data-days="90" data-apy="25" onclick="selectPlan(this)">
-      <div class="pc-popular">Mashxur</div>
-      <div class="pc-apy">25%</div>
-      <div class="pc-label">APY</div>
-      <div class="pc-days">90 kun</div>
-    </button>
-  </div>
-
-  <!-- Stake form -->
+  <!-- Add funds form -->
+  <div class="section-label">Mablag' qo'shish</div>
   <div class="stake-form">
-    <div class="sf-label">Stake miqdori</div>
+    <div class="sf-label">Miqdor (cheksiz marta qo'shish mumkin)</div>
     <div class="sf-input-row">
-      <input type="number" id="stake-amount" placeholder="0.00" min="0" step="0.01"/>
+      <input type="number" id="add-amount" placeholder="5.00" min="5" step="0.01"/>
       <span class="sf-unit">USDT</span>
       <button class="sf-max" onclick="setMaxAmount()">MAX</button>
     </div>
-    <div class="sf-estimate" id="sf-estimate">Taxminiy daromad: <b>$0.00</b> (90 kunda)</div>
+    <div class="sf-estimate" id="sf-estimate">Minimal qo'shish miqdori: <b>5 USDT</b></div>
     <div id="stake-error" class="error-msg"></div>
-    <button class="btn-stake" id="btn-stake" onclick="createStake()">
-      <span class="btn-text">Stake qilish</span>
-      <span class="btn-loader hidden" id="stake-loader"></span>
+    <button class="btn-stake" id="btn-add" onclick="addFunds()">
+      <span class="btn-text">Qo'shish</span>
+      <span class="btn-loader hidden" id="add-loader"></span>
     </button>
     <div id="stake-success" class="success-msg"></div>
-  </div>
-
-  <!-- Active stakes -->
-  <div class="section-label">Faol depozitlar</div>
-  <div id="active-stakes">
-    <div class="stake-skeleton"></div>
   </div>
 
   <div style="height:30px"></div>

@@ -1,12 +1,12 @@
 // ============================================
-//  DEXO TRADING — Staking Page Logic
+//  DEXO TRADING — Staking Page Logic (v2)
+//  Faqat 10% yillik APY · Daromad har sekund o'sadi
+//  Claim har 24 soatda · Cheksiz qo'shish (min 5 USDT)
 // ============================================
 import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  getFirestore, doc, getDoc, updateDoc,
-  collection, addDoc, getDocs, query, where, orderBy, serverTimestamp,
-  increment
+  getFirestore, doc, getDoc, setDoc, updateDoc, increment
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -24,20 +24,36 @@ const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
+// ── KONSTANTALAR ────────────────────────────
+const APY = 10;                              // Yillik foiz — FAQAT shu
+const MIN_ADD = 5;                            // Minimal qo'shish miqdori (USDT)
+const CLAIM_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 soat
+const YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+const RATE_PER_MS = (APY / 100) / YEAR_MS;    // Millisekundiga foiz koeffitsiyenti
+
 let myUid = null;
 let currentBalance = 0;
-let selectedPlan = { days: 90, apy: 25 };
-let activeStakesCache = [];
 let tickInterval = null;
 
-onAuthStateChanged(auth, (user) => {
+// Staking account state (Firestore: staking_accounts/{uid})
+let account = {
+  exists: false,
+  principal: 0,
+  accruedReward: 0,
+  lastUpdateTime: Date.now(),
+  lastClaimTime: Date.now(),
+  totalClaimed: 0,
+  createdAt: Date.now()
+};
+
+onAuthStateChanged(auth, async (user) => {
   if (!user) { window.location.href = "login.html"; return; }
   myUid = user.uid;
-  loadBalance();
-  loadActiveStakes();
+  await loadBalance();
+  await loadAccount();
 
-  // Har sekundda progress/vaqtni yangilash (faqat UI, Firestore-ga yozmaydi)
-  tickInterval = setInterval(renderActiveStakes, 1000);
+  renderLive();
+  tickInterval = setInterval(renderLive, 1000); // Har sekund — faqat UI, Firestore-ga yozmaydi
 });
 
 window.addEventListener("beforeunload", () => {
@@ -56,226 +72,225 @@ async function loadBalance() {
   }
 }
 
-// ── Reja tanlash ───────────────────────────────
-window.selectPlan = function(btn) {
-  document.querySelectorAll(".plan-card").forEach(c => c.classList.remove("active"));
-  btn.classList.add("active");
-  selectedPlan = {
-    days: parseInt(btn.dataset.days),
-    apy: parseFloat(btn.dataset.apy)
-  };
-  updateEstimate();
-};
+// ── Staking account-ni yuklash ─────────────────
+async function loadAccount() {
+  try {
+    const snap = await getDoc(doc(db, "staking_accounts", myUid));
+    if (snap.exists()) {
+      const d = snap.data();
+      account = {
+        exists: true,
+        principal:      Number(d.principal) || 0,
+        accruedReward:  Number(d.accruedReward) || 0,
+        lastUpdateTime: Number(d.lastUpdateTime) || Date.now(),
+        lastClaimTime:  Number(d.lastClaimTime) || Date.now(),
+        totalClaimed:   Number(d.totalClaimed) || 0,
+        createdAt:      Number(d.createdAt) || Date.now()
+      };
+      document.getElementById("smc-date").textContent = fmtDate(account.createdAt);
+    } else {
+      account.exists = false;
+      document.getElementById("smc-date").textContent = "—";
+    }
+  } catch (e) {
+    console.error("Staking account yuklashda xatolik:", e);
+  }
+}
 
-// ── Max miqdorni qo'yish ───────────────────────
+// ── Joriy jamlangan daromadni hisoblash (live) ──
+function calcLiveReward(now) {
+  if (account.principal <= 0) return account.accruedReward;
+  const pending = account.principal * RATE_PER_MS * (now - account.lastUpdateTime);
+  return account.accruedReward + Math.max(pending, 0);
+}
+
+// ── Har sekundda UI yangilash ──────────────────
+function renderLive() {
+  const now = Date.now();
+  const liveReward = calcLiveReward(now);
+
+  document.getElementById("smc-principal").textContent = "$" + fmtUSDT(account.principal);
+  document.getElementById("smc-reward-live").textContent = "$" + liveReward.toFixed(8);
+  document.getElementById("sb-claimed").textContent = "$" + fmtUSDT(account.totalClaimed);
+
+  const dailyEstimate = account.principal * (APY / 100) / 365;
+  document.getElementById("sb-daily").textContent = "$" + fmtUSDT(dailyEstimate);
+
+  const statusEl = document.getElementById("smc-status");
+  if (account.principal > 0) {
+    statusEl.textContent = "Faol";
+    statusEl.classList.add("active");
+  } else {
+    statusEl.textContent = "Faol emas";
+    statusEl.classList.remove("active");
+  }
+
+  // Claim tugmasi holati
+  const sinceLastClaim = now - account.lastClaimTime;
+  const canClaimByTime = sinceLastClaim >= CLAIM_COOLDOWN_MS;
+  const hasReward = liveReward > 0.00000001;
+
+  const claimBtn  = document.getElementById("btn-claim");
+  const claimText = document.getElementById("claim-btn-text");
+  const claimHint = document.getElementById("claim-hint");
+
+  if (!hasReward) {
+    claimBtn.disabled = true;
+    claimText.textContent = "Daromad yo'q";
+    claimHint.textContent = "Mablag' qo'shing va daromad yig'ila boshlaydi";
+  } else if (!canClaimByTime) {
+    claimBtn.disabled = true;
+    const remaining = CLAIM_COOLDOWN_MS - sinceLastClaim;
+    claimText.textContent = "Kutilmoqda";
+    claimHint.textContent = `Keyingi claim: ${formatRemaining(remaining)}`;
+  } else {
+    claimBtn.disabled = false;
+    claimText.textContent = `$${liveReward.toFixed(8)} olish`;
+    claimHint.textContent = "Daromadingizni hisobingizga o'tkazing";
+  }
+}
+
+// ── MAX tugmasi ─────────────────────────────────
 window.setMaxAmount = function() {
-  document.getElementById("stake-amount").value = currentBalance.toFixed(2);
-  updateEstimate();
+  document.getElementById("add-amount").value = currentBalance.toFixed(2);
+  updateAddEstimate();
 };
 
-document.getElementById("stake-amount").addEventListener("input", updateEstimate);
+document.getElementById("add-amount").addEventListener("input", updateAddEstimate);
 
-function updateEstimate() {
-  const amount = parseFloat(document.getElementById("stake-amount").value) || 0;
-  const reward = calcReward(amount, selectedPlan.apy, selectedPlan.days);
+function updateAddEstimate() {
+  const amount = parseFloat(document.getElementById("add-amount").value) || 0;
+  if (amount <= 0) {
+    document.getElementById("sf-estimate").innerHTML =
+      `Minimal qo'shish miqdori: <b>5 USDT</b>`;
+    return;
+  }
+  const newPrincipal = account.principal + amount;
+  const dailyEstimate = newPrincipal * (APY / 100) / 365;
   document.getElementById("sf-estimate").innerHTML =
-    `Taxminiy daromad: <b>$${fmtUSDT(reward)}</b> (${selectedPlan.days} kunda)`;
+    `Qo'shgandan keyin kunlik daromad: <b>$${fmtUSDT(dailyEstimate)}</b>`;
 }
 
-function calcReward(amount, apy, days) {
-  return amount * (apy / 100) * (days / 365);
-}
-
-// ── Stake yaratish ─────────────────────────────
-window.createStake = async function() {
-  const amount = parseFloat(document.getElementById("stake-amount").value);
+// ── Mablag' qo'shish (cheksiz marta, min 5 USDT) ──
+window.addFunds = async function() {
+  const amount = parseFloat(document.getElementById("add-amount").value);
 
   hideMsg();
 
   if (isNaN(amount) || amount <= 0) return showErr("Miqdorni to'g'ri kiriting.");
+  if (amount < MIN_ADD) return showErr(`Minimal qo'shish miqdori: ${MIN_ADD} USDT.`);
   if (amount > currentBalance) return showErr("Balansingizda yetarli mablag' yo'q.");
-  if (amount < 1) return showErr("Minimal stake miqdori: 1 USDT.");
 
-  setLoad(true);
+  setAddLoad(true);
 
   try {
     const now = Date.now();
-    const reward = calcReward(amount, selectedPlan.apy, selectedPlan.days);
-    const endTime = now + selectedPlan.days * 24 * 60 * 60 * 1000;
 
-    // Stake yozuvini yaratish
-    await addDoc(collection(db, "stakes"), {
-      userId: myUid,
-      amount: amount,
-      apy: selectedPlan.apy,
-      days: selectedPlan.days,
-      reward: reward,
-      startTime: now,
-      endTime: endTime,
-      status: "active",
-      createdAt: serverTimestamp()
-    });
+    // Joriy daromadni "bank"ga o'tkazish (principal o'zgarishidan oldin)
+    const pending = account.exists
+      ? account.principal * RATE_PER_MS * (now - account.lastUpdateTime)
+      : 0;
 
-    // Balansdan ayirish
+    const updatedAccount = {
+      principal:      account.principal + amount,
+      accruedReward:  account.accruedReward + Math.max(pending, 0),
+      lastUpdateTime: now,
+      lastClaimTime:  account.exists ? account.lastClaimTime : now,
+      totalClaimed:   account.exists ? account.totalClaimed : 0,
+      createdAt:      account.exists ? account.createdAt : now
+    };
+
+    await setDoc(doc(db, "staking_accounts", myUid), updatedAccount, { merge: true });
+
     await updateDoc(doc(db, "users", myUid), {
       balance: increment(-amount)
     });
 
+    // Local state yangilash
+    account = { exists: true, ...updatedAccount };
     currentBalance -= amount;
-    document.getElementById("bh-amount").textContent = fmtUSDT(currentBalance);
-    document.getElementById("stake-amount").value = "";
-    updateEstimate();
 
-    showSuccess(`✅ ${fmtUSDT(amount)} USDT muvaffaqiyatli stake qilindi!`);
-    await loadActiveStakes();
+    document.getElementById("bh-amount").textContent = fmtUSDT(currentBalance);
+    document.getElementById("smc-date").textContent = fmtDate(account.createdAt);
+    document.getElementById("add-amount").value = "";
+    updateAddEstimate();
+    renderLive();
+
+    showSuccess(`✅ $${fmtUSDT(amount)} USDT staking-ga qo'shildi!`);
 
   } catch (e) {
     showErr("Xatolik: " + e.message);
   }
-  setLoad(false);
+  setAddLoad(false);
 };
 
-// ── Faol stakelarni yuklash ────────────────────
-async function loadActiveStakes() {
-  try {
-    const snap = await getDocs(
-      query(collection(db, "stakes"),
-        where("userId", "==", myUid),
-        where("status", "==", "active"),
-        orderBy("startTime", "desc"))
-    );
-
-    activeStakesCache = [];
-    snap.forEach(d => activeStakesCache.push({ id: d.id, ...d.data() }));
-
-    renderActiveStakes();
-    updateSummaryStats();
-
-  } catch (e) {
-    console.error("Stakelarni yuklashda xatolik:", e);
-    document.getElementById("active-stakes").innerHTML =
-      `<div class="empty-state"><p>Yuklashda xatolik</p></div>`;
-  }
-}
-
-// ── Summary stats (Stakingda / Kutilayotgan foyda) ──
-function updateSummaryStats() {
-  const totalStaked = activeStakesCache.reduce((sum, s) => sum + s.amount, 0);
-  const totalReward = activeStakesCache.reduce((sum, s) => sum + s.reward, 0);
-  document.getElementById("sb-staked").textContent  = "$" + fmtUSDT(totalStaked);
-  document.getElementById("sb-rewards").textContent = "$" + fmtUSDT(totalReward);
-}
-
-// ── Faol stakelarni chizish (har sekundda chaqiriladi) ──
-function renderActiveStakes() {
-  const container = document.getElementById("active-stakes");
-
-  if (activeStakesCache.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <svg viewBox="0 0 48 48" fill="none">
-          <circle cx="24" cy="24" r="18" stroke="#2d3d52" stroke-width="2"/>
-          <path d="M24 14v10l7 4" stroke="#2d3d52" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <p>Hali faol depozitingiz yo'q<br/>Yuqoridan reja tanlab boshlang</p>
-      </div>`;
-    return;
-  }
-
+// ── Daromadni claim qilish (har 24 soatda 1 marta) ──
+window.claimReward = async function() {
   const now = Date.now();
-  container.innerHTML = "";
+  const sinceLastClaim = now - account.lastClaimTime;
 
-  activeStakesCache.forEach(s => {
-    const elapsed   = now - s.startTime;
-    const total     = s.endTime - s.startTime;
-    const progress  = Math.min(Math.max((elapsed / total) * 100, 0), 100);
-    const isMatured = now >= s.endTime;
-    const remainingMs = Math.max(s.endTime - now, 0);
-
-    const el = document.createElement("div");
-    el.className = "stake-card";
-    el.innerHTML = `
-      <div class="sc-top">
-        <div>
-          <div class="sc-amount">$${fmtUSDT(s.amount)}</div>
-          <span class="sc-plan">${s.days} kun · ${s.apy}% APY</span>
-        </div>
-        <div class="sc-reward">
-          <div class="sc-reward-label">Daromad</div>
-          <div class="sc-reward-val">+$${fmtUSDT(s.reward)}</div>
-        </div>
-      </div>
-      <div class="sc-progress-track">
-        <div class="sc-progress-fill" style="width:${progress}%"></div>
-      </div>
-      <div class="sc-bottom">
-        <span class="sc-time-left">${isMatured ? "✅ Tugadi" : formatRemaining(remainingMs)}</span>
-        <button class="sc-claim-btn" ${isMatured ? "" : "disabled"} onclick="claimStake('${s.id}')">
-          ${isMatured ? "Olish" : "Kutilmoqda"}
-        </button>
-      </div>
-    `;
-    container.appendChild(el);
-  });
-}
-
-// ── Stakeni undirish (claim) ───────────────────
-window.claimStake = async function(stakeId) {
-  const stake = activeStakesCache.find(s => s.id === stakeId);
-  if (!stake) return;
-
-  const now = Date.now();
-  if (now < stake.endTime) {
-    return; // Hali tugamagan
+  if (sinceLastClaim < CLAIM_COOLDOWN_MS) {
+    return; // Tugma disabled bo'lishi kerak, lekin xavfsizlik uchun qayta tekshiramiz
   }
+
+  const liveReward = calcLiveReward(now);
+  if (liveReward <= 0) return;
+
+  setClaimLoad(true);
 
   try {
-    const totalReturn = stake.amount + stake.reward;
-
-    await updateDoc(doc(db, "stakes", stakeId), {
-      status: "claimed",
-      claimedAt: serverTimestamp()
-    });
-
     await updateDoc(doc(db, "users", myUid), {
-      balance: increment(totalReturn)
+      balance: increment(liveReward)
     });
 
-    currentBalance += totalReturn;
+    const updatedAccount = {
+      principal:      account.principal,
+      accruedReward:  0,
+      lastUpdateTime: now,
+      lastClaimTime:  now,
+      totalClaimed:   account.totalClaimed + liveReward,
+      createdAt:      account.createdAt
+    };
+
+    await setDoc(doc(db, "staking_accounts", myUid), updatedAccount, { merge: true });
+
+    account = { exists: true, ...updatedAccount };
+    currentBalance += liveReward;
+
     document.getElementById("bh-amount").textContent = fmtUSDT(currentBalance);
+    renderLive();
 
-    showSuccess(`✅ $${fmtUSDT(totalReturn)} USDT hisobingizga qaytarildi!`);
-
-    await loadActiveStakes();
+    showSuccess(`✅ $${fmtUSDT(liveReward)} USDT hisobingizga o'tkazildi!`);
 
   } catch (e) {
-    showErr("Olishda xatolik: " + e.message);
+    showErr("Claim qilishda xatolik: " + e.message);
   }
+  setClaimLoad(false);
 };
 
-// ── Qolgan vaqtni formatlash ───────────────────
+// ── Qolgan vaqtni formatlash (soat:min:sek) ────
 function formatRemaining(ms) {
-  const totalSeconds = Math.floor(ms / 1000);
-  const days    = Math.floor(totalSeconds / 86400);
-  const hours   = Math.floor((totalSeconds % 86400) / 3600);
+  const totalSeconds = Math.max(Math.floor(ms / 1000), 0);
+  const hours   = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
-
-  if (days > 0)  return `${days}k ${hours}s qoldi`;
-  if (hours > 0) return `${hours}s ${minutes}m qoldi`;
-  if (minutes > 0) return `${minutes}m ${seconds}s qoldi`;
-  return `${seconds}s qoldi`;
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
 // ── UI Helpers ──────────────────────────────────
-function setLoad(on) {
-  document.getElementById("btn-stake").disabled = on;
-  document.getElementById("stake-loader").classList.toggle("hidden", !on);
+function setAddLoad(on) {
+  document.getElementById("btn-add").disabled = on;
+  document.getElementById("add-loader").classList.toggle("hidden", !on);
+}
+function setClaimLoad(on) {
+  document.getElementById("claim-loader").classList.toggle("hidden", !on);
 }
 function showErr(msg) {
   const el = document.getElementById("stake-error");
   el.textContent = msg;
   el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 4000);
 }
 function showSuccess(msg) {
   const el = document.getElementById("stake-success");
@@ -291,6 +306,9 @@ function fmtUSDT(n) {
   const num = Number(n) || 0;
   return num < 0.01 && num > 0 ? num.toFixed(8) : num.toFixed(2);
 }
+function fmtDate(ms) {
+  return new Date(ms).toLocaleDateString("uz-UZ", { day: "2-digit", month: "short", year: "numeric" });
+}
 
 // Boshlang'ich estimate
-updateEstimate();
+updateAddEstimate();
