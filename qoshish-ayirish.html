@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DEXO — Balans Boshqaruvi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="qoshish-ayirish.css"/>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<!-- HEADER -->
+<header class="top-header">
+  <div class="header-left">
+    <div class="logo-icon-sm">
+      <svg width="20" height="20" viewBox="0 0 36 36" fill="none">
+        <polygon points="18,2 34,10 34,26 18,34 2,26 2,10" fill="none" stroke="#00d4aa" stroke-width="2"/>
+        <circle cx="18" cy="18" r="4" fill="#00d4aa"/>
+      </svg>
+    </div>
+    <span class="header-brand">Balans Boshqaruvi</span>
+  </div>
+  <button class="logout-btn" id="logout-btn">Chiqish</button>
+</header>
+
+<main class="page-content">
+
+  <!-- ═══════ FOYDALANUVCHI QIDIRISH ═══════ -->
+  <div class="section-card">
+    <div class="section-head">
+      <div class="sh-icon">🔍</div>
+      <div>
+        <div class="sh-title">Foydalanuvchi qidirish</div>
+        <div class="sh-sub">Gmail (email) bo'yicha qidiring</div>
+      </div>
+    </div>
+
+    <div class="search-row">
+      <input id="search-email" type="email" placeholder="masalan: aziz@gmail.com" autocomplete="off"/>
+      <button class="btn-search" id="btn-search" onclick="searchUser()">
+        <span class="btn-text">Qidirish</span>
+        <span class="btn-loader hidden" id="search-loader"></span>
+      </button>
+    </div>
+    <div id="search-error" class="error-msg"></div>
+  </div>
+
+  <!-- ═══════ TOPILGAN FOYDALANUVCHI ═══════ -->
+  <div class="section-card hidden" id="user-card">
+    <div class="user-found">
+      <div class="uf-avatar" id="uf-avatar">U</div>
+      <div class="uf-info">
+        <div class="uf-name" id="uf-name">—</div>
+        <div class="uf-email" id="uf-email">—</div>
+        <div class="uf-uid" id="uf-uid">—</div>
+      </div>
+    </div>
+
+    <div class="balance-display">
+      <div class="bd-label">Joriy balans</div>
+      <div class="bd-amount"><span id="bd-amount">0.00</span> <span class="bd-unit">USDT</span></div>
+    </div>
+
+    <!-- Miqdor kiritish -->
+    <div class="form-group">
+      <label>Miqdor (USDT)</label>
+      <div class="amount-wrap">
+        <input id="amount-input" type="number" placeholder="0.00" min="0.01" step="0.01"/>
+        <span class="amount-unit">USDT</span>
+      </div>
+      <div class="quick-amounts">
+        <button onclick="setAmount(5)">5</button>
+        <button onclick="setAmount(10)">10</button>
+        <button onclick="setAmount(50)">50</button>
+        <button onclick="setAmount(100)">100</button>
+        <button onclick="setAmount(500)">500</button>
+        <button onclick="setAmount(1000)">1000</button>
+      </div>
+    </div>
+
+    <div id="action-error" class="error-msg"></div>
+
+    <!-- Qo'shish / Ayirish tugmalari -->
+    <div class="action-btns">
+      <button class="btn-add" id="btn-add" onclick="adjustBalance('add')">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>Qo'shish</span>
+        <span class="btn-loader hidden" id="add-loader"></span>
+      </button>
+      <button class="btn-subtract" id="btn-subtract" onclick="adjustBalance('subtract')">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>Ayirish</span>
+        <span class="btn-loader hidden" id="subtract-loader"></span>
+      </button>
+    </div>
+
+    <div id="action-success" class="success-msg"></div>
+  </div>
+
+  <!-- ═══════ OXIRGI AMALLAR (AUDIT LOG) ═══════ -->
+  <div class="section-card">
+    <div class="section-head">
+      <div class="sh-icon">📋</div>
+      <div>
+        <div class="sh-title">Oxirgi amallar</div>
+        <div class="sh-sub">Bajarilgan qo'shish/ayirish tarixi</div>
+      </div>
+    </div>
+    <div id="history-list">
+      <div class="hist-skeleton"></div>
+      <div class="hist-skeleton"></div>
+    </div>
+  </div>
+
+  <div style="height:40px"></div>
+</main>
+
+<script type="module" src="qoshish-ayirish.js"></script>
+</body>
+</html>
